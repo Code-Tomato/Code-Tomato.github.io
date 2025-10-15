@@ -5,9 +5,12 @@ import '../styles/global.css';
 export interface Props {
   title: string;
   description: string;
+  image?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, image = '/og-image.png' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(image, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -18,10 +21,24 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="author" content="Code-Tomato" />
+    <meta name="author" content="Nathan Lemma" />
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:site_name" content="Code-Tomato" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+    
     <title>{title} | Code-Tomato</title>
     
     <!-- Initialize theme before page renders to prevent flash -->
