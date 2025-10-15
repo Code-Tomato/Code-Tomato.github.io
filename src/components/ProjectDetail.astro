@@ -1,0 +1,381 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<article class="project-detail">
+  <div class="container">
+    <!-- Back Navigation -->
+    <a href="/projects" class="back-link reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Projects
+    </a>
+
+    <!-- Hero Section -->
+    <header class="project-hero reveal reveal-delay-1">
+      <div class="project-title-section">
+        <h1>{project.title}</h1>
+        <div class="project-meta">
+          <time datetime={project.date}>{project.dateDisplay}</time>
+          <span class="separator">•</span>
+          <span class={`status-badge ${project.statusColor}`}>{project.status}</span>
+          {project.teamProject && (
+            <>
+              <span class="separator">•</span>
+              <span class="team-badge">👥 Team Project</span>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div class="project-tags-hero">
+        {project.tags.map(tag => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
+
+      <p class="project-lead">{project.longDescription}</p>
+
+      <div class="project-actions">
+        <a href={project.github} class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          View on GitHub
+        </a>
+        {project.demo && (
+          <a href={project.demo} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            Live Demo
+          </a>
+        )}
+        {project.documentation && (
+          <a href={project.documentation} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Documentation
+          </a>
+        )}
+      </div>
+    </header>
+
+    <!-- Content Sections -->
+    <div class="project-content">
+      <!-- Key Features -->
+      <section class="content-section reveal reveal-delay-2">
+        <h2>Key Features</h2>
+        <ul class="features-list">
+          {project.keyFeatures.map(feature => (
+            <li>{feature}</li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Impact (if any) -->
+      {project.impact && (
+        <section class="content-section impact-section reveal reveal-delay-3">
+          <div class="impact-box">
+            <h2>Impact & Reflection</h2>
+            <p>{project.impact}</p>
+          </div>
+        </section>
+      )}
+    </div>
+
+    <!-- Categories -->
+    <div class="project-categories reveal">
+      <h3>Categories</h3>
+      <div class="category-tags">
+        {project.category.map(cat => (
+          <span class="category-tag">{cat}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .project-detail {
+    padding: 6rem 0 4rem;
+    background: var(--bg-primary);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 3rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--color-primary);
+    gap: 0.75rem;
+  }
+
+  .project-hero {
+    padding-bottom: 3rem;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 4rem;
+  }
+
+  .project-title-section h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 1rem;
+  }
+
+  .project-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .separator {
+    color: var(--border-color);
+  }
+
+  .status-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .status-badge.live,
+  .status-badge.completed {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+  }
+
+  .status-badge.developing,
+  .status-badge.ongoing {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ff9800;
+    border: 1px solid #ff9800;
+  }
+
+  .status-badge.archived {
+    background: rgba(158, 158, 158, 0.15);
+    color: #9e9e9e;
+    border: 1px solid #9e9e9e;
+  }
+
+  .team-badge {
+    background: var(--bg-secondary);
+    padding: 0.375rem 0.875rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+  }
+
+  .project-tags-hero {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+  }
+
+  .tag:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .project-lead {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    max-width: 800px;
+  }
+
+  .project-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .project-content {
+    max-width: 900px;
+  }
+
+  .content-section {
+    margin-bottom: 4rem;
+  }
+
+  .content-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .features-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .features-list li {
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    background: var(--bg-secondary);
+    border-left: 4px solid var(--color-primary);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+  }
+
+  .features-list li:hover {
+    transform: translateX(5px);
+    background: var(--bg-tertiary);
+  }
+
+  .features-list li::before {
+    content: '✓';
+    color: var(--color-primary);
+    font-weight: bold;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .impact-box {
+    background: linear-gradient(135deg, 
+      rgba(255, 107, 53, 0.1), 
+      rgba(247, 147, 30, 0.1),
+      rgba(255, 210, 63, 0.1)
+    );
+    padding: 2.5rem;
+    border-radius: 16px;
+    border-left: 4px solid var(--color-primary);
+  }
+
+  .impact-box h2 {
+    margin-bottom: 1rem;
+  }
+
+  .impact-box p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+
+  .project-categories {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 2px solid var(--border-color);
+  }
+
+  .project-categories h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+
+  .category-tags {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .category-tag {
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+
+  .category-tag:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .project-detail {
+      padding: 4rem 0 3rem;
+    }
+
+    .back-link {
+      margin-bottom: 2rem;
+    }
+
+    .project-hero {
+      margin-bottom: 3rem;
+    }
+
+    .project-title-section h1 {
+      font-size: 2rem;
+    }
+
+    .project-meta {
+      font-size: 0.9rem;
+    }
+
+    .project-lead {
+      font-size: 1.1rem;
+    }
+
+    .project-actions {
+      flex-direction: column;
+    }
+
+    .project-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .content-section h2 {
+      font-size: 1.75rem;
+    }
+
+    .features-list li {
+      font-size: 1rem;
+      padding: 0.875rem 1.25rem;
+    }
+
+    .impact-box {
+      padding: 1.5rem;
+    }
+  }
+</style>
+

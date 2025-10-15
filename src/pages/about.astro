@@ -1,0 +1,506 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const skills = {
+  systems: [
+    { name: 'C/C++', icon: '💻' },
+    { name: 'Operating Systems', icon: '🖥️' },
+    { name: 'Computer Architecture', icon: '⚙️' },
+    { name: 'gdb & QEMU', icon: '🔍' },
+    { name: 'LLVM IR', icon: '🔧' },
+  ],
+  embedded: [
+    { name: 'Firmware Development', icon: '📟' },
+    { name: 'RTOS', icon: '⏱️' },
+    { name: 'Hardware I/O (PWM, ADC)', icon: '🔌' },
+    { name: 'PCB Design (KiCAD)', icon: '🔩' },
+    { name: 'FPGA Development', icon: '🎛️' },
+  ],
+  tools: [
+    { name: 'Python', icon: '🐍' },
+    { name: 'Bash Scripting', icon: '💾' },
+    { name: 'Git & GitHub', icon: '🌿' },
+    { name: 'Docker', icon: '🐳' },
+    { name: 'Quantum Computing (Qiskit)', icon: '⚛️' },
+  ]
+};
+---
+
+<BaseLayout title="About" description="Learn about Nathan Lemma's background in ECE, research in ML systems and computer architecture, and industry experience at Caterpillar">
+  <!-- Hero Section -->
+  <section class="about-hero">
+    <div class="container">
+      <div class="hero-content reveal">
+        <h1>About Me</h1>
+        <p class="hero-subtitle">ECE Student · Researcher · Systems Engineer</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Story Section -->
+  <section class="section story-section">
+    <div class="container">
+      <div class="story-content reveal">
+        <h2>My Journey</h2>
+        <div class="story-intro">
+          <p>Hey there!</p>
+          <p>➤ I'm Nathan, an ECE student at UT Austin (Class of 2027).</p>
+          <p>➤ I'm passionate about bridging hardware and software through research and industry work.</p>
+          <p>➤ Here's a glimpse into my journey:</p>
+        </div>
+        
+        <div class="journey-timeline">
+          <div class="timeline-item">
+            <div class="timeline-icon">🎓</div>
+            <div class="timeline-content">
+              <h3>Academic Foundation</h3>
+              <p>ECE major at UT Austin with a Certificate in Advanced Mathematics, exploring the full stack from low-level systems to quantum algorithms.</p>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-icon">🔬</div>
+            <div class="timeline-content">
+              <h3>Research Experience</h3>
+              <p>Currently researching carbon-efficient ML systems. Previously worked on RISC-V simulators and compiler validation tools with the FAST Research Group.</p>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-icon">🏭</div>
+            <div class="timeline-content">
+              <h3>Industry Impact</h3>
+              <p>Systems Software Engineering Intern at Caterpillar, developing HAL libraries and hardware-in-the-loop tests for embedded systems.</p>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-icon">🏎️</div>
+            <div class="timeline-content">
+              <h3>Racing Team</h3>
+              <p>Leading battery management system development for Longhorn Racing's Formula SAE electric vehicle team.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What I Do Section -->
+  <section class="section services-section">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>What I Do</h2>
+        <p class="section-subtitle">Areas of focus and expertise</p>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card card reveal reveal-delay-1">
+          <div class="service-icon">💻</div>
+          <h3>Systems Programming</h3>
+          <p>
+            Building operating system kernels, compilers, and low-level software. Experience with Pintos, YASH shell, and RISC-V simulators for research applications.
+          </p>
+        </div>
+
+        <div class="service-card card reveal reveal-delay-2">
+          <div class="service-icon">📟</div>
+          <h3>Embedded Systems</h3>
+          <p>
+            Developing firmware, HAL libraries, and hardware-in-the-loop tests for embedded systems. Work includes battery management systems and ECM diagnostics.
+          </p>
+        </div>
+
+        <div class="service-card card reveal reveal-delay-3">
+          <div class="service-icon">🔬</div>
+          <h3>Research & Academic Projects</h3>
+          <p>
+            Conducting research in carbon-efficient ML systems, computer architecture, and quantum computing while contributing to academic and open-source projects.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section class="section skills-section">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Skills & Technologies</h2>
+        <p class="section-subtitle">Tools I use to bring ideas to life</p>
+      </div>
+
+      <!-- Systems Programming Skills -->
+      <div class="skill-category reveal reveal-delay-1">
+        <h3 class="category-title">
+          <span class="category-icon">💻</span>
+          Systems Programming
+        </h3>
+        <div class="skills-tags">
+          {skills.systems.map((skill) => (
+            <div class="skill-tag">
+              <span class="skill-icon">{skill.icon}</span>
+              <span class="skill-name">{skill.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Embedded Systems Skills -->
+      <div class="skill-category reveal reveal-delay-2">
+        <h3 class="category-title">
+          <span class="category-icon">📟</span>
+          Embedded Systems & Hardware
+        </h3>
+        <div class="skills-tags">
+          {skills.embedded.map((skill) => (
+            <div class="skill-tag">
+              <span class="skill-icon">{skill.icon}</span>
+              <span class="skill-name">{skill.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Tools & Languages Skills -->
+      <div class="skill-category reveal reveal-delay-3">
+        <h3 class="category-title">
+          <span class="category-icon">🛠️</span>
+          Languages & Tools
+        </h3>
+        <div class="skills-tags">
+          {skills.tools.map((skill) => (
+            <div class="skill-tag">
+              <span class="skill-icon">{skill.icon}</span>
+              <span class="skill-name">{skill.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Personal Touch Section -->
+  <section class="section personal-section">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Beyond the Code</h2>
+        <p class="section-subtitle">Things I do outside of engineering</p>
+      </div>
+      
+      <div class="personal-grid reveal reveal-delay-1">
+        <div class="personal-card">
+          <div class="personal-icon">🥁</div>
+          <h3>Percussion & Music</h3>
+          <p>I played percussion in the past and love exploring different musical genres. Great way to unwind after debugging embedded systems!</p>
+        </div>
+        
+        <div class="personal-card">
+          <div class="personal-icon">🚴‍♂️</div>
+          <h3>Biking & Racing</h3>
+          <p>When I'm not coding, you'll find me biking or working on our Formula SAE car. The engineering mindset applies to both!</p>
+        </div>
+        
+        <div class="personal-card">
+          <div class="personal-icon">📚</div>
+          <h3>Continuous Learning</h3>
+          <p>Always reading about new technologies, from quantum computing papers to the latest in systems programming. Knowledge is power!</p>
+        </div>
+        
+        <div class="personal-card">
+          <div class="personal-icon">🌱</div>
+          <h3>Problem Solving</h3>
+          <p>I thrive on challenges that require both analytical thinking and creative solutions. Every bug is a puzzle waiting to be solved!</p>
+        </div>
+      </div>
+
+      <div class="cta-section reveal">
+        <h3>Interested in working together?</h3>
+        <p>Let's create something amazing!</p>
+        <a href="/#contact" class="btn btn-primary">Get In Touch</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* About Hero */
+  .about-hero {
+    padding: 8rem 0 4rem;
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+    text-align: center;
+  }
+
+  .hero-subtitle {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+
+  /* Story Section */
+  .story-section {
+    background: var(--bg-primary);
+  }
+
+  .story-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .story-intro p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .story-intro p:first-child {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .journey-timeline {
+    margin: 2rem 0;
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .timeline-item:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .timeline-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .timeline-content h3 {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .timeline-content p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Services Section */
+  .services-section {
+    background: var(--bg-secondary);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .service-card {
+    text-align: center;
+  }
+
+  .service-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .service-card h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+
+  .service-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Skills Section */
+  .skills-section {
+    background: var(--bg-primary);
+  }
+
+  /* Personal Section */
+  .personal-section {
+    background: var(--bg-secondary);
+  }
+
+  .personal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .personal-card {
+    background: var(--bg-tertiary);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .personal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .personal-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .personal-card h3 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .personal-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    text-align: center;
+    padding: 3rem;
+    background: linear-gradient(135deg, 
+      rgba(255, 107, 53, 0.1), 
+      rgba(247, 147, 30, 0.1), 
+      rgba(255, 210, 63, 0.1)
+    );
+    border-radius: 16px;
+    margin-top: 2rem;
+  }
+
+  .cta-section h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cta-section p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-top: -0.5rem;
+  }
+
+  .skill-category {
+    margin-bottom: 4rem;
+  }
+
+  .category-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+  }
+
+  .category-icon {
+    font-size: 2rem;
+  }
+
+  .skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .skill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+
+  .skill-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--color-primary);
+  }
+
+  .skill-icon {
+    font-size: 1.25rem;
+  }
+
+  .skill-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .about-hero {
+      padding: 6rem 0 3rem;
+    }
+
+    .timeline-item {
+      flex-direction: row;
+      text-align: left;
+      gap: 1rem;
+    }
+
+    .timeline-icon {
+      margin-top: 0.2rem;
+    }
+
+    .personal-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .services-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .category-title {
+      font-size: 1.5rem;
+    }
+
+    .story-intro p {
+      font-size: 1.1rem;
+    }
+
+    .story-intro p:first-child {
+      font-size: 1.3rem;
+    }
+  }
+
+</style>

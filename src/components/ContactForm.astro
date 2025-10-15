@@ -1,0 +1,217 @@
+---
+// Contact Form Component
+---
+
+<div class="contact-form-wrapper">
+  <form class="contact-form" id="contact-form" action="https://formspree.io/f/movkydqd" method="POST">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        required 
+        placeholder="Your name"
+      />
+    </div>
+    
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email" 
+        required 
+        placeholder="your.email@example.com"
+      />
+    </div>
+    
+    <div class="form-group">
+      <label for="message">Message</label>
+      <textarea 
+        id="message" 
+        name="message" 
+        required 
+        rows="5"
+        placeholder="Your message..."
+      ></textarea>
+    </div>
+    
+    <!-- reCAPTCHA v2 -->
+    <div class="g-recaptcha" data-sitekey="6LcnMOsrAAAAAKloEjKCExXGpTRe3tgysabC96B2"></div>
+    
+    <button type="submit" class="btn btn-primary">
+      <span class="btn-text">Send Message</span>
+      <span class="btn-loading">Sending...</span>
+    </button>
+    
+    <div class="form-status" id="form-status"></div>
+  </form>
+</div>
+
+<style>
+  .contact-form-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  input,
+  textarea {
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    transform: translateY(-2px);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .contact-form button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-loading {
+    display: none;
+  }
+
+  .contact-form.loading .btn-text {
+    display: none;
+  }
+
+  .contact-form.loading .btn-loading {
+    display: inline;
+  }
+
+  .form-status {
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 500;
+    display: none;
+  }
+
+  .form-status.success {
+    display: block;
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+    border: 2px solid #4caf50;
+  }
+
+  .form-status.error {
+    display: block;
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+    border: 2px solid #f44336;
+  }
+
+  @media (max-width: 768px) {
+    .contact-form-wrapper {
+      padding: 0;
+    }
+  }
+</style>
+
+<!-- reCaptcha Script -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const formStatus = document.getElementById('form-status');
+
+  form?.addEventListener('submit', async (e) => {
+    // Check if reCAPTCHA is completed
+    const recaptchaResponse = (window as any).grecaptcha?.getResponse();
+    
+    if (!recaptchaResponse || recaptchaResponse.length === 0) {
+      e.preventDefault();
+      formStatus!.className = 'form-status error';
+      formStatus!.textContent = 'Please complete the reCAPTCHA verification.';
+      formStatus!.style.display = 'block';
+      
+      setTimeout(() => {
+        formStatus!.style.display = 'none';
+      }, 3000);
+      return;
+    }
+    
+    // Add loading state
+    form.classList.add('loading');
+    formStatus!.className = 'form-status';
+    formStatus!.style.display = 'none';
+    
+    // Form will submit naturally to Formspree with reCAPTCHA v2
+    // Formspree will validate the reCAPTCHA response
+  });
+
+  // Handle Formspree response
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get('status');
+  
+  if (status === 'success') {
+    formStatus!.className = 'form-status success';
+    formStatus!.textContent = 'Message sent successfully! I\'ll get back to you soon.';
+    formStatus!.style.display = 'block';
+    
+    // Clear URL parameters
+    window.history.replaceState({}, document.title, window.location.pathname);
+    
+    // Hide success message after 5 seconds
+    setTimeout(() => {
+      formStatus!.style.display = 'none';
+    }, 5000);
+  } else if (status === 'error') {
+    formStatus!.className = 'form-status error';
+    formStatus!.textContent = 'There was an error sending your message. Please try again.';
+    formStatus!.style.display = 'block';
+    
+    // Clear URL parameters
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  // Add animation to inputs
+  const inputs = document.querySelectorAll('input, textarea');
+  inputs.forEach(input => {
+    input.addEventListener('focus', () => {
+      input.parentElement?.classList.add('focused');
+    });
+    
+    input.addEventListener('blur', () => {
+      input.parentElement?.classList.remove('focused');
+    });
+  });
+</script>
+

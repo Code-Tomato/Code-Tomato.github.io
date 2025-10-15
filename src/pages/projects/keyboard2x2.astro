@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectDetail from '../../components/ProjectDetail.astro';
+import { getProjectBySlug } from '../../data/projects';
+
+const project = getProjectBySlug('keyboard2x2');
+if (!project) {
+  return Astro.redirect('/projects');
+}
+---
+
+<BaseLayout 
+  title={`${project.title} - Projects`}
+  description={project.description}
+>
+  <ProjectDetail project={project} />
+</BaseLayout>
+
