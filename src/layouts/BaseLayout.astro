@@ -1,4 +1,6 @@
 ---
+import '@fontsource-variable/reddit-sans/index.css';
+import '@fontsource/reddit-mono/latin-400.css';
 import Header from '../components/Header.astro';
 import '../styles/global.css';
 
@@ -13,67 +15,100 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL(image, Astro.site);
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="generator" content={Astro.generator} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="generator" content="Astro" />
     <meta name="description" content={description} />
     <meta name="author" content="Nathan Lemma" />
     <link rel="canonical" href={canonicalURL} />
-    
-    <!-- Open Graph / Facebook -->
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageURL} />
-    <meta property="og:site_name" content="Code-Tomato" />
-    
+    <meta property="og:site_name" content="Nathan Lemma" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
-    
-    <title>{title} | Code-Tomato</title>
-    
-    <!-- Initialize theme before page renders to prevent flash -->
+
+    <title>{title} · Nathan Lemma</title>
+
+    <!-- Theme init before paint: stored choice wins, else system preference -->
     <script is:inline>
-      const theme = localStorage.getItem('theme') || 'light';
-      document.documentElement.setAttribute('data-theme', theme);
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', stored === 'dark' || stored === 'light' ? stored : system);
+      })();
     </script>
   </head>
   <body>
+    <div class="bg" aria-hidden="true"><div class="bg-orbs"></div></div>
+    <a href="#main" class="skip-link">Skip to main content</a>
     <Header />
-    <main>
+    <main id="main">
       <slot />
     </main>
-    
-    <!-- Scroll reveal animations -->
-    <script>
-      // Intersection Observer for scroll animations
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, observerOptions);
-
-      // Observe all elements with .reveal class
-      document.addEventListener('DOMContentLoaded', () => {
-        const revealElements = document.querySelectorAll('.reveal');
-        revealElements.forEach(el => observer.observe(el));
-      });
-    </script>
+    <footer class="site-footer">
+      <div class="foot-white" title="Soli Deo Gloria" aria-hidden="true"></div>
+      <div class="container footer-row">
+        <p class="small footer-line">© 2026 Nathan Lemma · Built by hand in Austin, TX.</p>
+      </div>
+    </footer>
   </body>
 </html>
+
+<style>
+  /* Full-bleed white footer lifted by a top shadow; a cross planted on a
+     rock is cut out of it (right side, snapped to the bottom edge) so the
+     gradient shows through. The cross lives on its own layer — the text
+     sits above and is never touched by the mask. */
+  .site-footer {
+    position: relative;
+    background: transparent;
+    padding-block: 2.6rem 2.8rem;
+    min-height: 190px;
+    box-shadow: 0 -26px 54px -26px var(--slab-sh);
+  }
+
+  .foot-white {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--paper);
+    /* Latin cross — equal top/left/right arms, shorter bottom — planted on a small
+       rock, centered along the footer's bottom edge. */
+    --cross-rock: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 14 64 70'><path fill='black' d='M28 18 H36 V34 H52 V42 H36 V70 H28 V42 H12 V34 H28 Z'/><path fill='black' d='M19 84 C 20 74 27 70 32 71 C 38 70 44 74 45 84 Z'/></svg>");
+    -webkit-mask: var(--cross-rock) 50% 100% / 62px 68px no-repeat, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: var(--cross-rock) 50% 100% / 62px 68px no-repeat, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  .footer-row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-8);
+    border-top: 1.5px solid color-mix(in oklch, var(--ink) 16%, transparent);
+    padding-top: var(--space-4);
+  }
+
+  .footer-line {
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+  }
+</style>

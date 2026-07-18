@@ -1,217 +1,181 @@
 ---
-// Contact Form Component
+// Formspree-backed contact form. Submits via fetch so success/error shows
+// in place; falls back to a native POST when JS is unavailable.
+// Spam control: honeypot field (_gotcha) instead of third-party captcha.
 ---
 
-<div class="contact-form-wrapper">
-  <form class="contact-form" id="contact-form" action="https://formspree.io/f/movkydqd" method="POST">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input 
-        type="text" 
-        id="name" 
-        name="name" 
-        required 
-        placeholder="Your name"
-      />
-    </div>
-    
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input 
-        type="email" 
-        id="email" 
-        name="email" 
-        required 
-        placeholder="your.email@example.com"
-      />
-    </div>
-    
-    <div class="form-group">
-      <label for="message">Message</label>
-      <textarea 
-        id="message" 
-        name="message" 
-        required 
-        rows="5"
-        placeholder="Your message..."
-      ></textarea>
-    </div>
-    
-    <!-- reCAPTCHA v2 -->
-    <div class="g-recaptcha" data-sitekey="6LcnMOsrAAAAAKloEjKCExXGpTRe3tgysabC96B2"></div>
-    
-    <button type="submit" class="btn btn-primary">
-      <span class="btn-text">Send Message</span>
-      <span class="btn-loading">Sending...</span>
-    </button>
-    
-    <div class="form-status" id="form-status"></div>
-  </form>
-</div>
+<form class="contact-form" id="contact-form" action="https://formspree.io/f/movkydqd" method="POST" novalidate>
+  <div class="form-field">
+    <label for="contact-name">Name</label>
+    <input type="text" id="contact-name" name="name" required autocomplete="name" aria-describedby="error-name" />
+    <p class="field-error small" id="error-name" hidden>Please enter your name.</p>
+  </div>
+
+  <div class="form-field">
+    <label for="contact-email">Email</label>
+    <input
+      type="email"
+      id="contact-email"
+      name="email"
+      required
+      autocomplete="email"
+      placeholder="you@example.com"
+      aria-describedby="error-email"
+    />
+    <p class="field-error small" id="error-email" hidden>Please enter your email so I can reply.</p>
+  </div>
+
+  <div class="form-field">
+    <label for="contact-message">Message</label>
+    <textarea id="contact-message" name="message" required rows="6" aria-describedby="error-message"></textarea>
+    <p class="field-error small" id="error-message" hidden>Please enter a message.</p>
+  </div>
+
+  <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true" />
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary" id="contact-submit">Send message</button>
+    <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+  </div>
+</form>
 
 <style>
-  .contact-form-wrapper {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
   .contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    display: grid;
+    gap: var(--space-6);
+    max-width: 36rem;
   }
 
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  .form-field {
+    display: grid;
+    gap: var(--space-2);
   }
 
   label {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink);
   }
 
   input,
   textarea {
-    padding: 1rem;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    font-family: var(--font-sans);
     font-size: 1rem;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    outline: none;
+    color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--line-input);
+    padding: 0.75rem 0.85rem;
+    transition: border-color 100ms var(--ease);
   }
 
-  input:focus,
-  textarea:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
-    transform: translateY(-2px);
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--ink-3);
+  }
+
+  input:hover,
+  textarea:hover {
+    border-color: var(--ink);
+  }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 1px;
+    border-color: var(--ink);
   }
 
   textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 8rem;
   }
 
-  .contact-form button {
-    position: relative;
-    overflow: hidden;
+  .field-error {
+    color: var(--accent);
+    font-weight: 600;
   }
 
-  .btn-loading {
-    display: none;
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
   }
 
-  .contact-form.loading .btn-text {
-    display: none;
-  }
-
-  .contact-form.loading .btn-loading {
-    display: inline;
+  .form-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
   }
 
   .form-status {
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 500;
-    display: none;
+    font-size: var(--text-small);
+    color: var(--ink-2);
+    margin: 0;
   }
 
-  .form-status.success {
-    display: block;
-    background: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
-    border: 2px solid #4caf50;
+  .form-status.is-error {
+    color: var(--accent);
+    font-weight: 600;
   }
 
-  .form-status.error {
-    display: block;
-    background: rgba(244, 67, 54, 0.1);
-    color: #f44336;
-    border: 2px solid #f44336;
-  }
-
-  @media (max-width: 768px) {
-    .contact-form-wrapper {
-      padding: 0;
-    }
+  button[disabled] {
+    opacity: 0.6;
+    cursor: default;
   }
 </style>
 
-<!-- reCaptcha Script -->
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
 <script>
-  const form = document.getElementById('contact-form') as HTMLFormElement;
-  const formStatus = document.getElementById('form-status');
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const status = document.getElementById('form-status');
+  const submit = document.getElementById('contact-submit') as HTMLButtonElement | null;
+
+  const fields = [
+    { input: 'contact-name', error: 'error-name' },
+    { input: 'contact-email', error: 'error-email' },
+    { input: 'contact-message', error: 'error-message' },
+  ];
+
+  const validate = () => {
+    let ok = true;
+    for (const f of fields) {
+      const input = document.getElementById(f.input) as HTMLInputElement | HTMLTextAreaElement | null;
+      const error = document.getElementById(f.error);
+      const valid = !!input && input.checkValidity();
+      error?.toggleAttribute('hidden', valid);
+      input?.setAttribute('aria-invalid', String(!valid));
+      if (!valid) ok = false;
+    }
+    return ok;
+  };
 
   form?.addEventListener('submit', async (e) => {
-    // Check if reCAPTCHA is completed
-    const recaptchaResponse = (window as any).grecaptcha?.getResponse();
-    
-    if (!recaptchaResponse || recaptchaResponse.length === 0) {
-      e.preventDefault();
-      formStatus!.className = 'form-status error';
-      formStatus!.textContent = 'Please complete the reCAPTCHA verification.';
-      formStatus!.style.display = 'block';
-      
-      setTimeout(() => {
-        formStatus!.style.display = 'none';
-      }, 3000);
-      return;
+    e.preventDefault();
+    if (!validate() || !status || !submit) return;
+
+    status.classList.remove('is-error');
+    status.textContent = 'Sending your message…';
+    submit.disabled = true;
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      status.textContent = "Message sent — thank you. I'll reply soon.";
+      form.reset();
+    } catch {
+      status.classList.add('is-error');
+      status.textContent =
+        "Your message didn't send. Check your connection and try again, or email me at nlemma@utexas.edu.";
+    } finally {
+      submit.disabled = false;
     }
-    
-    // Add loading state
-    form.classList.add('loading');
-    formStatus!.className = 'form-status';
-    formStatus!.style.display = 'none';
-    
-    // Form will submit naturally to Formspree with reCAPTCHA v2
-    // Formspree will validate the reCAPTCHA response
-  });
-
-  // Handle Formspree response
-  const urlParams = new URLSearchParams(window.location.search);
-  const status = urlParams.get('status');
-  
-  if (status === 'success') {
-    formStatus!.className = 'form-status success';
-    formStatus!.textContent = 'Message sent successfully! I\'ll get back to you soon.';
-    formStatus!.style.display = 'block';
-    
-    // Clear URL parameters
-    window.history.replaceState({}, document.title, window.location.pathname);
-    
-    // Hide success message after 5 seconds
-    setTimeout(() => {
-      formStatus!.style.display = 'none';
-    }, 5000);
-  } else if (status === 'error') {
-    formStatus!.className = 'form-status error';
-    formStatus!.textContent = 'There was an error sending your message. Please try again.';
-    formStatus!.style.display = 'block';
-    
-    // Clear URL parameters
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-
-  // Add animation to inputs
-  const inputs = document.querySelectorAll('input, textarea');
-  inputs.forEach(input => {
-    input.addEventListener('focus', () => {
-      input.parentElement?.classList.add('focused');
-    });
-    
-    input.addEventListener('blur', () => {
-      input.parentElement?.classList.remove('focused');
-    });
   });
 </script>
-

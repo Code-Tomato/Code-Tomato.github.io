@@ -1,247 +1,179 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
-
 const currentPath = Astro.url.pathname;
+const isActive = (path: string) => currentPath === path || currentPath === `${path}/`;
+
+const links = [
+  { href: '/projects', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const sun = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>`;
+const moon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M20.5 13.3A8 8 0 1 1 10.7 3.5 6.3 6.3 0 0 0 20.5 13.3Z"/></svg>`;
 ---
 
 <header class="header">
-  <nav class="nav">
-    <div class="nav-container">
-      <a href="/" class="logo">
-        <span class="logo-icon">🍅</span>
-        <span class="logo-text">Code-Tomato</span>
-      </a>
-      
-      <div class="nav-menu" id="nav-menu">
-        <ul class="nav-list">
-          <li><a href="/" class={currentPath === '/' ? 'active' : ''}>Home</a></li>
-          <li><a href="/about" class={currentPath === '/about' || currentPath === '/about/' ? 'active' : ''}>About</a></li>
-          <li><a href="/projects" class={currentPath === '/projects' || currentPath === '/projects/' ? 'active' : ''}>Projects</a></li>
-        </ul>
-      </div>
+  <nav class="nav" aria-label="Main">
+    <a href="/" class="brand" aria-label="Nathan Lemma — home">
+      <svg class="mark" width="20" height="20" viewBox="0 0 16 16" aria-hidden="true">
+        <path class="mark-stem" d="M8 6 V3" fill="none" stroke-width="1.8" />
+        <path class="mark-stem" d="M8 3.4 L5.2 4.9 M8 3.4 L10.8 4.9" fill="none" stroke-width="1.6" stroke-linecap="square" />
+        <rect x="3.25" y="6" width="9.5" height="9.5" rx="1.6" fill="var(--accent)" />
+      </svg>
+      <span class="brand-name">Nathan Lemma</span>
+    </a>
 
-      <div class="nav-actions">
-        <ThemeToggle />
-        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
+    <div class="nav-right">
+      <ul class="nav-list">
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href} class="nav-link" aria-current={isActive(link.href) ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <button class="theme-toggle theme-desktop" type="button" aria-label="Toggle light and dark">
+        <span class="i-sun" set:html={sun} />
+        <span class="i-moon" set:html={moon} />
+      </button>
     </div>
+
+    <button class="theme-toggle theme-mobile" type="button" aria-label="Toggle light and dark">
+      <span class="i-sun" set:html={sun} />
+      <span class="i-moon" set:html={moon} />
+    </button>
   </nav>
 </header>
 
 <style>
   .header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: var(--blur-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-  }
-
-  .header.scrolled {
-    box-shadow: var(--shadow-md);
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: var(--z-nav);
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem 1.2rem;
+    pointer-events: none;
   }
 
   .nav {
-    width: 100%;
-  }
-
-  .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
+    width: min(100%, var(--container));
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: all 0.3s ease;
-  }
-
-  .logo:hover {
-    transform: translateY(-2px);
-  }
-
-  .logo-icon {
-    font-size: 2rem;
-    animation: float 3s ease-in-out infinite;
-  }
-
-  .logo-text {
-    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-mid), var(--color-gradient-end));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .nav-menu {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-  }
-
-  .nav-list {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .nav-list a {
-    color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-
-  .nav-list a:hover {
-    color: var(--color-primary);
-    background: var(--bg-tertiary);
-    transform: translateY(0);
-  }
-
-  .nav-list a.active {
-    color: var(--color-primary);
-    background: var(--bg-tertiary);
-  }
-
-  .nav-list a.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--color-gradient-start), var(--color-gradient-mid));
-    border-radius: 2px;
-  }
-
-  .nav-actions {
-    display: flex;
-    align-items: center;
     gap: 1rem;
   }
 
-  .hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
+  /* solid pills */
+  .brand,
+  .nav-right {
+    pointer-events: auto;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    border-radius: 999px;
+    background: var(--paper);
+    border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+    box-shadow: var(--pill-sh);
+  }
+
+  .brand {
+    gap: 0.5rem;
+    padding: 0.34rem 0.95rem 0.34rem 0.8rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .mark { flex: none; align-self: center; transform: translateY(-2px); filter: drop-shadow(0 2px 3px color-mix(in oklch, var(--accent) 40%, transparent)); }
+  .mark-stem { stroke: var(--leaf); }
+  .brand-name { font-weight: 680; letter-spacing: -0.01em; font-size: 0.95rem; line-height: 1; color: var(--ink); }
+
+  .nav-right { gap: 0.25rem; padding: 0.3rem 0.35rem; }
+  .nav-list { display: flex; align-items: center; gap: 0.1rem; list-style: none; }
+  .nav-link {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 540;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    transition: color 160ms var(--ease), background 160ms var(--ease);
+  }
+  .nav-link:hover { color: var(--accent); }
+  .nav-link[aria-current='page'] { color: var(--accent); background: color-mix(in oklch, var(--accent) 12%, transparent); }
+
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
     background: transparent;
     border: none;
+    color: var(--ink);
     cursor: pointer;
-    padding: 8px;
+    transition: background 160ms var(--ease), color 160ms var(--ease);
   }
+  .theme-toggle:hover { background: color-mix(in oklch, var(--accent) 14%, transparent); color: var(--accent); }
+  .theme-toggle .i-sun,
+  .theme-toggle .i-moon { display: grid; place-items: center; }
+  .theme-toggle .i-moon { display: none; }
+  :global([data-theme='dark']) .theme-toggle .i-sun { display: none; }
+  :global([data-theme='dark']) .theme-toggle .i-moon { display: grid; }
 
-  .hamburger span {
-    width: 24px;
-    height: 3px;
-    background: var(--text-primary);
-    border-radius: 3px;
-    transition: all 0.3s ease;
-  }
+  .theme-mobile { display: none; }
 
-  .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(7px, 7px);
-  }
+  /* mobile: brand circle top-left · toggle circle top-right · links float at the bottom */
+  @media (max-width: 720px) {
+    .header { pointer-events: none; padding: 0.8rem 0.9rem; }
+    .nav { position: static; }
 
-  .hamburger.active span:nth-child(2) {
-    opacity: 0;
-  }
+    .brand {
+      pointer-events: auto;
+      position: fixed; top: 0.85rem; left: 0.95rem;
+      width: 48px; height: 48px; justify-content: center; gap: 0; padding: 0;
+    }
+    .brand-name { display: none; }
 
-  .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
-  }
+    .theme-desktop { display: none; }
 
-  @media (max-width: 768px) {
-    .nav-container {
-      padding: 1rem;
+    .nav-right {
+      pointer-events: auto;
+      position: fixed; left: 0; right: 0; bottom: 1rem; top: auto;
+      margin-inline: auto; width: max-content;
     }
 
-    .hamburger {
-      display: flex;
-    }
-
-    .nav-menu {
-      position: fixed;
-      top: 73px;
-      left: 0;
-      right: 0;
-      background: var(--blur-bg);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      padding: 1rem;
-      transform: translateY(-100%);
-      opacity: 0;
-      transition: all 0.3s ease;
-      pointer-events: none;
-    }
-
-    .nav-menu.active {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .nav-list {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .nav-list a {
-      display: block;
-      padding: 1rem;
-      text-align: center;
+    .theme-mobile {
+      display: grid;
+      pointer-events: auto;
+      position: fixed; top: 0.85rem; right: 0.95rem;
+      width: 48px; height: 48px; border-radius: 999px;
+      background: var(--paper);
+      border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+      box-shadow: var(--pill-sh);
     }
   }
 </style>
 
 <script>
-  // Add scroll effect
-  const header = document.querySelector('.header');
-  const hamburger = document.getElementById('hamburger');
-  const navMenu = document.getElementById('nav-menu');
+  const html = document.documentElement;
+  const toggles = document.querySelectorAll<HTMLButtonElement>('.theme-toggle');
 
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 0) {
-      header?.classList.add('scrolled');
-    } else {
-      header?.classList.remove('scrolled');
-    }
-  });
+  const syncLabel = () => {
+    const dark = html.getAttribute('data-theme') === 'dark';
+    toggles.forEach((t) => t.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme'));
+  };
+  syncLabel();
 
-  // Mobile menu toggle
-  hamburger?.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu?.classList.toggle('active');
-  });
-
-  // Close menu when clicking a link
-  const navLinks = document.querySelectorAll('.nav-list a');
-  navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      hamburger?.classList.remove('active');
-      navMenu?.classList.remove('active');
-    });
-  });
+  toggles.forEach((t) =>
+    t.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      syncLabel();
+    })
+  );
 </script>

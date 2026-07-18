@@ -1,690 +1,692 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ContactForm from '../components/ContactForm.astro';
-import { getRecentProjects } from '../data/projects';
+import { getProjectBySlug, type Project } from '../data/projects';
+import { publication } from '../data/experience';
 
-const recentProjects = getRecentProjects(3);
+function must(slug: string): Project {
+  const p = getProjectBySlug(slug);
+  if (!p) throw new Error(`Missing project in data layer: ${slug}`);
+  return p;
+}
+
+const baselines = must('serving-baselines');
+const chtRadix = must('cht-radix');
+const mllm = must('mllm-energy');
+const pintos = must('pintos');
+
+const work = [
+  { index: '01', project: baselines },
+  { index: '02', project: chtRadix },
+  { index: '03', project: mllm },
+  { index: '04', project: pintos },
+];
 ---
 
-<BaseLayout title="Home" description="Nathan Lemma - ECE student at UT Austin specializing in systems programming, embedded systems, and hardware design">
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-background">
-      <div class="gradient-orb orb-1"></div>
-      <div class="gradient-orb orb-2"></div>
-      <div class="gradient-orb orb-3"></div>
-    </div>
-    
-    <div class="container hero-content">
-      <div class="hero-text reveal">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          Available for work
-        </div>
-        <h1 class="hero-title">
-          Hi, I'm <span class="gradient-text">Nathan Lemma</span>
-        </h1>
-        <div class="typing-container">
-          <p class="hero-subtitle">
-            I explore <span class="typed-text"></span><span class="cursor">|</span>
-          </p>
-        </div>
-        <p class="hero-description">
-          An ECE student at UT Austin exploring systems programming, hardware design, 
-          and embedded systems through research and industry work.
+<BaseLayout
+  title="Home"
+  description="Nathan Lemma — systems for machine learning, built from the metal up. ECE at UT Austin, SOSP '26 contributor, systems software at Caterpillar."
+>
+  <!-- ============ HERO: window to the gradient ============ -->
+  <section class="hero section-window">
+    <div class="container">
+      <p class="label hero-kicker">Nathan Lemma — ECE, UT Austin</p>
+      <h1 class="display hero-title">
+        Systems for machine learning, built from the metal&nbsp;up.
+      </h1>
+      <div class="hero-foot">
+        <p class="hero-lede">
+          I make GPU inference serving faster and more energy-efficient. I got here by way of
+          firmware, kernels, and concurrent data structures.
         </p>
-        <div class="hero-cta">
-          <a href="#contact" class="btn btn-primary">Get In Touch</a>
-          <a href="/projects" class="btn btn-secondary">View Projects</a>
-        </div>
-      </div>
-      
-      <div class="hero-image reveal reveal-delay-1">
-        <div class="floating-card card-1">
-          <div class="card-icon">⚡</div>
-          <div class="card-text">Systems Programming</div>
-        </div>
-        <div class="floating-card card-2">
-          <div class="card-icon">🔧</div>
-          <div class="card-text">Embedded Systems</div>
-        </div>
-        <div class="floating-card card-3">
-          <div class="card-icon">🔬</div>
-          <div class="card-text">Hardware Design</div>
+        <div class="hero-actions">
+          <a class="btn btn-on-accent" href="/projects">Explore the work</a>
+          <a class="link-dir hero-alt" href="/projects/serving-baselines">How I test serving systems ↗</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- About Section -->
-  <section class="section about-section">
+  <!-- ============ 01 / PUBLICATION ============ -->
+  <section id="publication" class="section" aria-labelledby="pub-heading">
     <div class="container">
-      <div class="section-header reveal">
-        <h2>About Me</h2>
-        <p class="section-subtitle">From hardware to software, systems to research</p>
+      <div class="sec-head">
+        <span class="sec-index">01</span>
+        <span class="sec-label" id="pub-heading">Publication</span>
+        <span class="sec-aside">peer review in progress</span>
       </div>
-      
-      <div class="about-content reveal reveal-delay-1">
-        <div class="about-intro">
-          <p>Hello!</p>
-          <p>➤ I'm Nathan, an ECE major at UT Austin.</p>
-          <p>➤ I'm passionate about creating technology that makes a difference.</p>
-          <p>➤ Below are some of the fields I have interests in:</p>
+
+      <div class="pub-grid">
+        <p class="pub-venue" aria-label={`${publication.venue}, ${publication.note}`}>
+          <span class="pub-venue-name">{publication.venue}</span>
+          <span class="label pub-note">{publication.note}</span>
+        </p>
+        <div class="pub-body">
+          <p class="pub-line">{publication.line}</p>
+          <p class="pub-more"><a class="link-dir" href="/projects/serving-baselines">The baselines I built ↗</a></p>
         </div>
-        
-        <div class="about-interests">
-          <div class="interest-item">
-            <span class="interest-icon">🔄</span>
-            <div class="interest-content">
-              <strong>Software Systems</strong> - Building OS projects; Focus: compilers, distributed systems, and research
-            </div>
-          </div>
-          <div class="interest-item">
-            <span class="interest-icon">🔧</span>
-            <div class="interest-content">
-              <strong>Embedded Systems</strong> - Developed HAL libraries, diagnostic tools, and firmware automation at CAT
-            </div>
-          </div>
-          <div class="interest-item">
-            <span class="interest-icon">🌐</span>
-            <div class="interest-content">
-              <strong>Full-Stack</strong> - Built GoodEats, a React + Supabase app recommending 50+ student food deals
-            </div>
-          </div>
-          <div class="interest-item">
-            <span class="interest-icon">🔮</span>
-            <div class="interest-content">
-              <strong>Quantum Computing</strong> - Strong interest, with experience implementing hybrid algorithms like VQE
-            </div>
-          </div>
-        </div>
-        
-        <a href="/about" class="btn btn-secondary">Learn More About Me</a>
       </div>
     </div>
   </section>
 
-  <!-- Featured Projects Section -->
-  <section class="section featured-section">
+  <!-- ============ 02 / SELECTED WORK ============ -->
+  <section class="section section-gray" aria-labelledby="work-heading">
     <div class="container">
-      <div class="section-header reveal">
-        <h2>Featured Projects</h2>
-        <p class="section-subtitle">Some of my recent work</p>
+      <div class="sec-head">
+        <span class="sec-index">02</span>
+        <span class="sec-label" id="work-heading">Selected work</span>
+        <span class="sec-aside">write-ups · repos · numbers you can check</span>
       </div>
-      
-      <div class="projects-grid">
-        {recentProjects.map((project, index) => (
-          <div class={`project-card reveal reveal-delay-${index + 1}`}>
-            <div class="card-gradient">
-              <div class="card-gradient-inner">
-                <div class="project-header">
-                  <h3>{project.title}</h3>
-                </div>
-                <p class="project-date-small">{project.dateDisplay}</p>
-                <p>{project.description}</p>
-                <div class="project-tags">
-                  {project.tags.slice(0, 3).map(tag => (
-                    <span class="tag">{tag}</span>
-                  ))}
-                  {project.tags.length > 3 && (
-                    <span class="tag">+{project.tags.length - 3}</span>
+
+      <div class="work-list">
+        {
+          work.map(({ index, project }) => (
+            <article class="work-item">
+              <p class="num work-num" aria-hidden="true">{index}</p>
+              <div class="work-body">
+                <h2 class="work-title">
+                  <a class="link-quiet" href={`/projects/${project.slug}`}>{project.title}</a>
+                </h2>
+                <p class="work-result">{project.headline}</p>
+                <p class="work-desc">{project.description}</p>
+                <ul class="work-links">
+                  {project.links.github && (
+                    <li><a class="link-dir" href={project.links.github}>Repo ↗</a></li>
                   )}
-                </div>
-                <div class="project-links">
-                  <a href={`/projects/${project.slug}`} class="project-link">
-                    View Details →
-                  </a>
-                </div>
+                  {project.links.documentation && (
+                    <li><a class="link-dir" href={project.links.documentation}>Write-up ↗</a></li>
+                  )}
+                  {project.links.paper && (
+                    <li><a class="link-dir" href={project.links.paper}>Paper ↗</a></li>
+                  )}
+                  <li><a class="link-dir" href={`/projects/${project.slug}`}>Details →</a></li>
+                </ul>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      <div class="text-center reveal reveal-delay-3">
-        <a href="/projects" class="btn btn-primary">View All Projects</a>
+              <div class="work-fig">
+                {project.slug === 'serving-baselines' && (
+                  <div class="frame fig-frame">
+                    <svg
+                      class="fig"
+                      viewBox="0 0 320 210"
+                      role="img"
+                      aria-label="Pipeline schematic: the GPUlets and USHER papers flow through reimplementation code modules into a check-marked validation stage."
+                    >
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M20 20 h44 l12 12 v40 h-56 Z" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M64 20 v12 h12" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M20 112 h44 l12 12 v40 h-56 Z" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M64 112 v12 h12" />
+                      <text x="16" y="88">gpulets paper</text>
+                      <text x="16" y="180">usher paper</text>
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M124 28 h72 v36 h-72 Z" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M132 38 h32 M132 46 h44 M132 54 h24" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M124 120 h72 v36 h-72 Z" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M132 130 h32 M132 138 h44 M132 146 h24" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M76 138 h48" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M196 138 h18 v-46 h18" />
+                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M76 46 h48 M196 46 h18 v46 h18 M296 92 h12" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M232 70 h64 v44 h-64 Z" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M250 92 l8 8 l18 -20" />
+                      <text x="264" y="132" text-anchor="middle" class="t-muted">validated</text>
+                      <rect class="nd" x="122" y="44" width="4" height="4" />
+                      <rect class="nd" x="122" y="136" width="4" height="4" />
+                      <rect class="nd" x="230" y="90" width="4" height="4" />
+                      <rect class="nd-hot" x="306" y="90" width="4" height="4" />
+                    </svg>
+                  </div>
+                )}
+                {project.slug === 'cht-radix' && (
+                  <div class="frame fig-frame">
+                    <svg
+                      class="fig"
+                      viewBox="0 0 480 260"
+                      role="img"
+                      aria-label="Throughput plot: the fine-grained curve climbs to 88.36 million operations per second, 13 times above the dashed coarse-locked baseline."
+                    >
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M36 28 v192 h420" />
+                      <path class="s-teal dashed" vector-effect="non-scaling-stroke" d="M36 208 C 140 206, 240 200, 400 196" />
+                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M36 204 C 140 196, 240 92, 400 52" />
+                      <rect class="nd-hot" x="398" y="50" width="4" height="4" />
+                      <text x="416" y="44" text-anchor="end" class="t-major">88.36M ops/s</text>
+                      <text x="416" y="186" text-anchor="end" class="t-muted">coarse lock</text>
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M432 52 v144 M429 52 h6 M429 196 h6" />
+                      <text x="440" y="128" class="t-major">13×</text>
+                      <text x="36" y="16" class="t-muted">ops/s</text>
+                      <text x="240" y="244" text-anchor="middle" class="t-muted">threads</text>
+                    </svg>
+                  </div>
+                )}
+                {project.slug === 'mllm-energy' && (
+                  <div class="frame fig-frame">
+                    <svg
+                      class="fig"
+                      viewBox="0 0 320 200"
+                      role="img"
+                      aria-label="Request timeline for InternVL3-8B on an NVIDIA A100: decode occupies 88.7 percent of request time while SM utilization stays near 14 percent."
+                    >
+                      <defs>
+                        <pattern id="hatch05" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--accent-grid)" stroke-width="1.5" />
+                        </pattern>
+                      </defs>
+                      <rect x="24" y="40" width="31" height="20" fill="url(#hatch05)" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 40 h272 v20 h-272 Z" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M55 40 v20" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M40 40 v-12" />
+                      <text x="24" y="24">prefill</text>
+                      <text x="120" y="24">decode — 88.7% of time</text>
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 96 v76 h272" />
+                      <path class="s-muted dashed" vector-effect="non-scaling-stroke" d="M24 100 h272" />
+                      <text x="296" y="94" text-anchor="end" class="t-muted">100%</text>
+                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M24 106 h24 v56 h248" />
+                      <rect class="nd-hot" x="46" y="160" width="4" height="4" />
+                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M180 162 v-14" />
+                      <text x="150" y="142">14% sm util</text>
+                    </svg>
+                  </div>
+                )}
+                {project.slug === 'pintos' && (
+                  <div class="frame fig-frame">
+                    <svg
+                      class="fig"
+                      viewBox="0 0 320 184"
+                      role="img"
+                      aria-label="Pintos kernel layer stack: user processes above the user/kernel boundary, then system calls, virtual memory, and file system below it."
+                    >
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 24 h160 v30 h-160 Z" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 62 h160 v30 h-160 Z" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 100 h160 v30 h-160 Z" />
+                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 138 h160 v30 h-160 Z" />
+                      <text x="112" y="43" text-anchor="middle">user processes</text>
+                      <text x="112" y="81" text-anchor="middle">system calls</text>
+                      <text x="112" y="119" text-anchor="middle">virtual memory</text>
+                      <text x="112" y="157" text-anchor="middle">file system</text>
+                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M20 58 h184 M20 55 v6 M204 55 v6" />
+                      <rect class="nd-hot" x="110" y="56" width="4" height="4" />
+                      <text x="212" y="54">user/kernel</text>
+                      <text x="212" y="68">boundary</text>
+                    </svg>
+                  </div>
+                )}
+                <p class="label fig-date"><time datetime={project.date}>{project.dateDisplay}</time></p>
+              </div>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
 
-  <!-- Contact Section -->
-  <section class="section contact-section" id="contact">
+  <!-- ============ 03 / EXPERIENCE ============ -->
+  <section class="section" aria-labelledby="traj-heading">
     <div class="container">
-      <div class="section-header reveal">
-        <h2>Get In Touch</h2>
-        <p class="section-subtitle">Let's build something amazing together!</p>
+      <div class="sec-head">
+        <span class="sec-index">03</span>
+        <span class="sec-label" id="traj-heading">Experience</span>
+        <span class="sec-aside">2023 → 2026</span>
       </div>
-      
-      <div class="contact-content reveal reveal-delay-1">
-        <ContactForm />
-        
-        <div class="social-links">
-          <a href="https://github.com/Code-Tomato" class="social-link" target="_blank" rel="noopener noreferrer">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-            GitHub
-          </a>
-          <a href="https://linkedin.com/in/nathanylemma/" class="social-link" target="_blank" rel="noopener noreferrer">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-            LinkedIn
-          </a>
-          <a href="mailto:nlemma100@gmail.com" class="social-link">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            Email
-          </a>
-        </div>
+
+      <p class="sec-intro">
+        At Caterpillar I've moved up the stack across three teams. At UT Austin the research went
+        from an instruction-accurate RISC-V simulator to multi-GPU serving baselines for
+        systems-for-ML work.
+      </p>
+
+      <ol class="traj">
+        <li class="stop">
+          <p class="stop-year" aria-hidden="true">2023</p>
+          <div class="stop-body">
+            <h3 class="stop-title">Hardware</h3>
+            <p class="stop-desc">
+              Longhorn Racing FSAE Electric — led battery-management system design; state-of-charge
+              algorithm within 5% range error.
+            </p>
+          </div>
+        </li>
+        <li class="stop">
+          <p class="stop-year" aria-hidden="true">2024</p>
+          <div class="stop-body">
+            <h3 class="stop-title">Embedded</h3>
+            <p class="stop-desc">
+              Firmware turned professional at Caterpillar; instruction-accurate RISC-V simulation in
+              UT's FAST group.
+            </p>
+            <ul class="stubs">
+              <li>
+                <span class="stub-text">Platform software — HAL &amp; API layers, now in production</span>
+                <span class="label stub-date">2024–25</span>
+              </li>
+              <li>
+                <span class="stub-text">System diagnostics — HIL tests across 30 I/O types</span>
+                <span class="label stub-date">2025–26</span>
+              </li>
+              <li>
+                <span class="stub-text">Data &amp; analytics — .NET + AWS Lambda usage metering</span>
+                <span class="label stub-date">2026–</span>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="stop">
+          <p class="stop-year" aria-hidden="true">2025</p>
+          <div class="stop-body">
+            <h3 class="stop-title">OS &amp; concurrency</h3>
+            <p class="stop-desc">
+              Pintos built out from the bare kernel; concurrent hash tables and radix trees
+              benchmarked under real LLM traces.
+            </p>
+          </div>
+        </li>
+        <li class="stop">
+          <p class="stop-year" aria-hidden="true">2026</p>
+          <div class="stop-body">
+            <h3 class="stop-title">Systems for ML</h3>
+            <p class="stop-desc">
+              Built the multi-GPU serving baselines behind a SOSP '26 paper on energy-efficient
+              inference serving.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="traj-more"><a class="link-dir" href="/about">More about the path →</a></p>
+    </div>
+  </section>
+
+  <!-- ============ 04 / CONTACT ============ -->
+  <section id="contact" class="section section-gray" aria-labelledby="contact-heading">
+    <div class="container">
+      <div class="sec-head">
+        <span class="sec-index">04</span>
+        <span class="sec-label" id="contact-heading">Contact</span>
+        <span class="sec-aside">replies within 48h</span>
       </div>
+
+      <p class="sec-intro">
+        Hiring for a systems role, weighing research fit, or just want to talk GPU
+        scheduling? I read everything.
+      </p>
+
+      <a class="btn btn-primary" href="/contact">Get in touch →</a>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* Hero Section */
+  /* ---- hero: window to the gradient ---- */
   .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    padding: 2rem 0;
+    padding-block: clamp(2.5rem, 1rem + 4vw, 5rem) clamp(3.5rem, 2rem + 6vw, 8rem);
   }
 
-  .hero-background {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 0;
-  }
-
-  .gradient-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.3;
-    animation: float 8s ease-in-out infinite;
-    pointer-events: none;
-    will-change: transform;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-
-  .orb-1 {
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, var(--color-gradient-start) 0%, var(--color-gradient-start) 100%);
-    top: -100px;
-    right: -100px;
-    animation-delay: 0s;
-  }
-
-  .orb-2 {
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, var(--color-gradient-mid) 0%, var(--color-gradient-mid) 100%);
-    bottom: -150px;
-    left: -150px;
-    animation-delay: 2s;
-  }
-
-  .orb-3 {
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, var(--color-gradient-end) 0%, var(--color-gradient-end) 100%);
-    top: 50%;
-    left: 50%;
-    animation-delay: 4s;
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 1rem;
-  }
-
-  .badge-dot {
-    width: 8px;
-    height: 8px;
-    background: #4caf50;
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+  .hero-kicker {
+    color: color-mix(in oklch, var(--plate-ink) 80%, var(--plate-bg));
+    margin-bottom: var(--space-6);
   }
 
   .hero-title {
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    margin-bottom: 1rem;
+    max-width: 16ch;
+  }
+
+  .hero-foot {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: end;
+    margin-top: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+  }
+
+  @media (min-width: 900px) {
+    .hero-foot {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-16);
+    }
+  }
+
+  .hero-lede {
+    font-size: var(--text-lede);
+    font-weight: 500;
+    line-height: 1.4;
+    max-width: 44ch;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .hero-alt {
+    color: var(--plate-ink);
+    border-bottom-color: var(--plate-ink);
+  }
+
+  .hero-alt:hover {
+    color: var(--plate-ink);
+    border-bottom-color: transparent;
+  }
+
+  /* ---- 01 / publication ---- */
+  .pub-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .pub-grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-16);
+    }
+  }
+
+  .pub-venue {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    max-width: none;
+  }
+
+  .pub-venue-name {
+    font-size: var(--text-num);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .pub-note {
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    padding: 0.3rem 0.55rem;
+    white-space: nowrap;
+  }
+
+  .pub-line {
+    color: var(--ink-2);
+  }
+
+  .pub-more {
+    margin-top: var(--space-6);
+  }
+
+  /* ---- 02 / selected work ---- */
+  .work-list {
+    display: grid;
+  }
+
+  .work-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .work-item:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  @media (min-width: 960px) {
+    .work-item {
+      grid-template-columns: minmax(4.5rem, 8rem) minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-8);
+    }
+  }
+
+  .work-num {
+    line-height: 0.9;
+  }
+
+  .work-title {
+    font-size: var(--text-h3);
+    font-weight: 800;
+    letter-spacing: -0.008em;
+    text-transform: uppercase;
     line-height: 1.1;
   }
 
-  .typing-container {
-    min-height: 3rem;
+  .work-result {
+    margin-top: var(--space-3);
+    font-size: 1.185rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ink);
+    max-width: 40ch;
+    text-wrap: balance;
   }
 
-  .hero-subtitle {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    color: var(--text-primary);
-    margin-bottom: 1.5rem;
+  .work-desc {
+    margin-top: var(--space-3);
+    color: var(--ink-2);
+    max-width: 56ch;
   }
 
-  .typed-text {
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-
-  .cursor {
-    color: var(--color-primary);
-    animation: blink 1s step-end infinite;
-  }
-
-  .hero-description {
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-    max-width: 600px;
-    margin-bottom: 2rem;
-  }
-
-  .hero-cta {
+  .work-links {
+    list-style: none;
     display: flex;
-    gap: 1rem;
     flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-6);
   }
 
-  .hero-image {
-    position: relative;
-    height: 400px;
+  .work-links a {
+    display: inline-block;
+    padding-block: 0.55rem;
+    margin-block: -0.4rem;
   }
 
-  .floating-card {
-    position: absolute;
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    border-radius: 16px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
+  .work-fig {
+    align-self: start;
   }
 
-  .floating-card:hover {
-    transform: translateY(-10px) !important;
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-primary);
+  .fig-frame {
+    padding: var(--space-4);
   }
 
-  .card-1 {
-    top: 15%;
-    left: 5%;
-    animation: float 4s ease-in-out infinite;
+  .fig-date {
+    margin-top: var(--space-2);
+    color: var(--ink-3);
   }
 
-  .card-2 {
-    top: 45%;
-    right: 5%;
-    animation: float 5s ease-in-out infinite;
-    animation-delay: 1s;
+  /* Phones read text first; the figure follows as illustration. */
+  @media (max-width: 959.98px) {
+    .work-num {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .work-fig {
+      order: 3;
+    }
   }
 
-  .card-3 {
-    bottom: 15%;
-    left: 20%;
-    animation: float 6s ease-in-out infinite;
-    animation-delay: 2s;
+  /* ---- figure language: two inks + the blue point ---- */
+  .fig text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    fill: var(--ink-2);
+    font-variant-numeric: tabular-nums;
   }
 
-  .card-icon {
-    font-size: 2rem;
+  .fig .t-muted {
+    fill: var(--ink-3);
   }
 
-  .card-text {
-    font-weight: 600;
-    color: var(--text-primary);
+  .fig .t-major {
+    fill: var(--ink);
+    font-weight: 700;
   }
 
-  /* Section Styles */
-  .section {
-    padding: 5rem 0;
+  .s-muted,
+  .s-struct,
+  .s-hot,
+  .s-teal {
+    fill: none;
+    stroke-width: 1.5;
   }
 
-  .section-header {
-    text-align: center;
-    margin-bottom: 3rem;
+  .s-muted { stroke: var(--ink-3); }
+  .s-struct { stroke: var(--ink); }
+  .s-hot { stroke: var(--accent); stroke-width: 2; }
+  .s-teal { stroke: var(--accent-grid); }
+
+  .dashed {
+    stroke-dasharray: 4 4;
   }
 
-  .section-subtitle {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    margin-top: -0.5rem;
+  .nd { fill: var(--ink); }
+  .nd-hot { fill: var(--accent); }
+
+  /* ---- 03 / experience ---- */
+  .sec-intro {
+    color: var(--ink-2);
+    margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
   }
 
-  .about-section {
-    background: var(--bg-secondary);
-  }
-
-  .about-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: left;
-  }
-
-  .about-intro p {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-
-  .about-intro p:first-child {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-  }
-
-
-  .about-interests {
-    margin: 2rem 0;
-  }
-
-  .interest-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: var(--bg-tertiary);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-  }
-
-  .interest-item:hover {
-    border-color: var(--color-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .interest-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-    margin-top: 0.2rem;
-  }
-
-  .interest-content {
-    flex: 1;
-    font-size: 1.1rem;
-    line-height: 1.5;
-  }
-
-  .interest-content strong {
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-
-  /* Projects Grid */
-  .projects-grid {
+  .traj {
+    list-style: none;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr;
-    gap: 2rem;
-    margin-bottom: 3rem;
   }
 
-  .project-card {
-    display: flex;
-    flex-direction: column;
+  .stop {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2) var(--space-8);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--line-soft);
   }
 
-  .card-gradient {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  @media (min-width: 720px) {
+    .stop {
+      grid-template-columns: minmax(4.5rem, 8rem) minmax(0, 1fr);
+    }
   }
 
-  .card-gradient-inner {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    height: 100%;
+  .stop-year {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    letter-spacing: 0.09em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.35rem;
   }
 
-  .project-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+  .stop-title {
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
   }
 
-  .project-date-small {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
+  .stop-desc {
+    margin-top: var(--space-2);
+    max-width: 60ch;
   }
 
-  .status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.875rem;
-    font-weight: 600;
+  .stubs {
+    list-style: none;
+    margin-top: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    border-left: 2px solid var(--line);
+    padding-left: var(--space-6);
   }
 
-  .status-badge.live {
-    background: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
-  }
-
-  .status-badge.developing {
-    background: rgba(255, 152, 0, 0.1);
-    color: #ff9800;
-  }
-
-  .project-tags {
+  .stubs li {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 1rem 0;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
   }
 
-  .tag {
-    padding: 0.375rem 0.875rem;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
+  .stub-text {
+    font-size: var(--text-small);
+    color: var(--ink-2);
   }
 
-  .project-links {
-    margin-top: 1.5rem;
+  .stub-date {
+    color: var(--ink-3);
+    white-space: nowrap;
   }
 
-  .project-link {
-    color: var(--color-primary);
-    font-weight: 600;
-    transition: all 0.3s ease;
+  .traj-more {
+    margin-top: var(--space-8);
   }
 
-  .project-link:hover {
-    color: var(--color-secondary);
+  /* ---- 04 / contact ---- */
+  .pin-list {
+    list-style: none;
+    max-width: 46rem;
+    border-bottom: 2px solid var(--line);
   }
 
-  .text-center {
-    text-align: center;
+  .pin-row {
+    display: grid;
+    grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--line);
+    text-decoration: none;
+    color: inherit;
   }
 
-  /* Contact Section */
-  .contact-content {
-    max-width: 800px;
-    margin: 0 auto;
+  .pin-label {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--ink);
   }
 
-  .social-links {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
+  .pin-value {
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+    text-transform: none;
+    letter-spacing: 0.02em;
   }
 
-  .social-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    color: var(--text-primary);
-    font-weight: 600;
-    transition: all 0.3s ease;
+  .pin-arrow {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink);
+    transition: color 100ms var(--ease), translate 100ms var(--ease);
   }
 
-  .social-link:hover {
-    border-color: var(--color-primary);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+  .pin-row:hover .pin-label,
+  .pin-row:hover .pin-arrow {
+    color: var(--accent);
   }
 
-  /* Responsive */
-  @media (max-width: 1024px) and (min-width: 769px) {
-    .projects-grid {
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: 1fr;
+  .pin-row:hover .pin-arrow {
+    translate: 4px 0;
+  }
+
+  @media (max-width: 480px) {
+    .pin-row {
+      grid-template-columns: minmax(0, 1fr) auto;
     }
-    
-    .project-card:nth-child(3) {
-      grid-column: 1 / -1;
-      max-width: none;
+
+    .pin-value {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .pin-arrow {
+      grid-row: 1 / span 2;
+      align-self: center;
     }
   }
 
-  @media (max-width: 768px) {
-    .hero-content {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
+  .contact-form-wrap {
+    margin-top: var(--space-12);
+    max-width: 46rem;
+  }
 
-    .hero-image {
-      height: 300px;
-      order: -1;
-    }
-
-    .floating-card {
-      padding: 1rem;
-    }
-
-    .card-text {
-      font-size: 0.9rem;
-    }
-
-    .hero-cta {
-      flex-direction: column;
-    }
-
-    .hero-cta .btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .social-links {
-      flex-direction: column;
-    }
-
-    .social-link {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .projects-grid {
-      grid-template-columns: 1fr;
-      grid-auto-rows: auto;
-    }
-
-    .interest-item {
-      flex-direction: row;
-      text-align: left;
-      gap: 1rem;
-    }
-
-    .interest-icon {
-      margin-top: 0.2rem;
-    }
-
-    .about-intro p {
-      font-size: 1.1rem;
-    }
-
-    .about-intro p:first-child {
-      font-size: 1.3rem;
+  @media (prefers-reduced-motion: reduce) {
+    .pin-row:hover .pin-arrow {
+      translate: none;
     }
   }
 </style>
-
-<script>
-  // Typing animation
-  const texts = [
-    'operating systems',
-    'embedded systems',
-    'hardware designs',
-    'research projects',
-    'quantum algorithms',
-    'system software'
-  ];
-  let textIndex = 0;
-  let charIndex = 0;
-  let isDeleting = false;
-  const typedTextElement = document.querySelector('.typed-text');
-
-  function type() {
-    const currentText = texts[textIndex];
-    
-    if (isDeleting) {
-      typedTextElement!.textContent = currentText.substring(0, charIndex - 1);
-      charIndex--;
-    } else {
-      typedTextElement!.textContent = currentText.substring(0, charIndex + 1);
-      charIndex++;
-    }
-
-    if (!isDeleting && charIndex === currentText.length) {
-      isDeleting = true;
-      setTimeout(type, 2000);
-    } else if (isDeleting && charIndex === 0) {
-      isDeleting = false;
-      textIndex = (textIndex + 1) % texts.length;
-      setTimeout(type, 500);
-    } else {
-      setTimeout(type, isDeleting ? 50 : 100);
-    }
-  }
-
-  // Start typing animation
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(type, 1000);
-  });
-</script>

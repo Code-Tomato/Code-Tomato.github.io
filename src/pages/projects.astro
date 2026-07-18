@@ -1,363 +1,413 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { projects } from '../data/projects';
+import {
+  getFeaturedProjects,
+  getCurrentProjects,
+  getArchivedProjects,
+  getProcessTable,
+  type Project
+} from '../data/projects';
+
+const featured = getFeaturedProjects();
+const current = getCurrentProjects();
+const archived = getArchivedProjects();
+const index = getProcessTable();
+
+const nn = (n: number) => String(n).padStart(2, '0');
+const tierLabel: Record<string, string> = {
+  featured: 'Featured',
+  current: 'Shipped',
+  archived: 'Archive',
+};
+
+const linkList = (p: Project) => {
+  const out: { href: string; label: string }[] = [];
+  if (p.links.github) out.push({ href: p.links.github, label: 'Repo ↗' });
+  if (p.links.documentation) out.push({ href: p.links.documentation, label: 'Write-up ↗' });
+  if (p.links.paper) out.push({ href: p.links.paper, label: 'Paper ↗' });
+  return out;
+};
+
+const archiveYears = archived.map((p) => Number(p.date.slice(0, 4)));
+const archiveSpan = `${Math.min(...archiveYears)}–${Math.max(...archiveYears)}`;
 ---
 
-<BaseLayout title="Projects" description="Explore Nathan's projects spanning operating systems, embedded systems, hardware design, and quantum computing">
-  <!-- Hero Section -->
-  <section class="projects-hero">
+<BaseLayout
+  title="Work"
+  description="Systems projects with write-ups, repos, and numbers you can check — GPU scheduling, concurrent data structures, kernels, and the archive where it started."
+>
+  <!-- Page head -->
+  <section class="page-head">
     <div class="container">
-      <div class="hero-content reveal">
-        <h1>My Projects</h1>
-        <p class="hero-subtitle">A showcase of my work and experiments</p>
-      </div>
+      <h1 class="display">Work</h1>
+      <p class="lede page-lede">
+        Each project ships with a write-up, a repo, and numbers you can check.
+      </p>
     </div>
   </section>
 
-  <!-- Projects Bento Grid -->
-  <section class="section projects-section">
+  <!-- 01 / INDEX -->
+  <section class="section-tight" aria-labelledby="index-heading">
     <div class="container">
-      <div class="projects-grid">
-        {projects.map((project) => (
-          <div class="project-item reveal">
-            <a href={`/projects/${project.slug}`} class="project-card-link">
-              <div class={`project-card ${project.gradient}`}>
-                <div class="project-content">
-                  <div class="project-header">
-                    <h3>{project.title}</h3>
-                  </div>
-                  
-                  <p class="project-date">{project.dateDisplay}</p>
-                  <p class="project-description">{project.description}</p>
-                  
-                  <div class="project-tags">
-                    {project.tags.slice(0, 4).map(tag => (
-                      <span class="tag">{tag}</span>
-                    ))}
-                    {project.tags.length > 4 && (
-                      <span class="tag">+{project.tags.length - 4}</span>
-                    )}
-                  </div>
-                  
-                  <div class="project-footer">
-                    <span class="view-more">View Details →</span>
-                    {project.teamProject && (
-                      <span class="team-badge">👥 Team</span>
-                    )}
-                  </div>
-                </div>
+      <div class="sec-head">
+        <span class="sec-index">01</span>
+        <span class="sec-label" id="index-heading">Index</span>
+        <span class="sec-aside">12 projects · updated 2026-07</span>
+      </div>
+
+      <ol class="idx-list">
+        {
+          index.map((p) => (
+            <li>
+              <a class="idx-row" href={`/projects/${p.slug}`}>
+                <span class="label idx-no">{nn(p.pid)}</span>
+                <span class="idx-title">{p.title}</span>
+                <span class="label idx-tier">{tierLabel[p.tier]}</span>
+                <span class="label idx-year"><time datetime={p.date}>{p.date.slice(0, 4)}</time></span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 02 / FEATURED -->
+  <section class="section" aria-labelledby="featured-heading">
+    <div class="container">
+      <div class="sec-head">
+        <span class="sec-index">02</span>
+        <span class="sec-label" id="featured-heading">Featured</span>
+        <span class="sec-aside">current research &amp; systems</span>
+      </div>
+
+      <div class="feat-list">
+        {
+          featured.map((p, i) => (
+            <article class="feat-item">
+              <p class="num feat-num" aria-hidden="true">{nn(i + 1)}</p>
+              <div class="feat-body">
+                <h2 class="feat-title">
+                  <a class="link-quiet" href={`/projects/${p.slug}`}>{p.title}</a>
+                </h2>
+                <p class="feat-result">{p.headline}</p>
+                <p class="feat-desc">{p.longDescription}</p>
+                <ul class="feat-links">
+                  {linkList(p).map((l) => (
+                    <li><a class="link-dir" href={l.href}>{l.label}</a></li>
+                  ))}
+                  <li><a class="link-dir" href={`/projects/${p.slug}`}>Details →</a></li>
+                </ul>
               </div>
-            </a>
-          </div>
-        ))}
+              <p class="label feat-meta">
+                <time datetime={p.date}>{p.dateDisplay}</time>
+              </p>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
 
-  <!-- CTA Section -->
-  <section class="section cta-section">
+  <!-- 03 / SHIPPED -->
+  <section class="section section-gray" aria-labelledby="shipped-heading">
     <div class="container">
-      <div class="cta-content reveal">
-        <h2>Interested in Working Together?</h2>
-        <p>I'm always excited to work on new projects and collaborate with fellow developers.</p>
-        <div class="cta-buttons">
-          <a href="/#contact" class="btn btn-primary">Get In Touch</a>
-          <a href="/about" class="btn btn-secondary">Learn More About Me</a>
-        </div>
+      <div class="sec-head">
+        <span class="sec-index">03</span>
+        <span class="sec-label" id="shipped-heading">Shipped</span>
+        <span class="sec-aside">2025</span>
       </div>
+
+      <ul class="row-list">
+        {
+          current.map((p) => (
+            <li class="row-item">
+              <div class="row-head">
+                <h3 class="row-title">
+                  <a class="link-quiet" href={`/projects/${p.slug}`}>{p.title}</a>
+                </h3>
+                <ul class="row-links">
+                  {linkList(p).map((l) => (
+                    <li><a class="link-dir" href={l.href}>{l.label}</a></li>
+                  ))}
+                </ul>
+              </div>
+              <p class="row-desc">{p.description}</p>
+              <p class="label row-date"><time datetime={p.date}>{p.dateDisplay}</time></p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 04 / ARCHIVE -->
+  <section class="section" id="archive" aria-labelledby="archive-heading">
+    <div class="container">
+      <div class="sec-head">
+        <span class="sec-index">04</span>
+        <span class="sec-label" id="archive-heading">Where I started</span>
+        <span class="sec-aside">{archiveSpan}</span>
+      </div>
+
+      <p class="sec-intro">
+        Race-car battery systems, a quantum-computing experiment, a keyboard designed from the
+        PCB up. I've moved on from all of it, but everything is preserved here in full,
+        code included.
+      </p>
+
+      <ul class="arc-list">
+        {
+          archived.map((p) => (
+            <li>
+              <a class="arc-row" href={`/projects/${p.slug}`}>
+                <span class="arc-title">{p.title}</span>
+                <span class="arc-desc">{p.description}</span>
+                <span class="label arc-meta"><time datetime={p.date}>{p.date.slice(0, 4)}</time></span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* Projects Hero */
-  .projects-hero {
-    padding: 8rem 0 4rem;
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
-    text-align: center;
+  /* ---- page head ---- */
+  .page-head {
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem) clamp(2rem, 1rem + 3vw, 4rem);
   }
 
-  .hero-subtitle {
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    margin-top: 0.5rem;
+  .page-lede {
+    margin-top: var(--space-4);
+    max-width: 46ch;
   }
 
-  /* Uniform Grid Layout */
-  .projects-section {
-    background: var(--bg-primary);
+  .section-tight {
+    padding-block: var(--space-8) var(--section-pad);
   }
 
-  .projects-grid {
+  /* ---- 01 / index ---- */
+  .idx-list {
+    list-style: none;
+    border-bottom: 2px solid var(--line);
+  }
+
+  .idx-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-  }
-
-  .project-item {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .project-card-link {
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    min-height: 2.75rem;
+    border-top: 1px solid var(--line-soft);
     text-decoration: none;
-    display: block;
-    height: 100%;
+    color: inherit;
   }
 
-  .project-card {
-    height: 100%;
-    min-height: 420px;
-    border-radius: 20px;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s ease;
-    border: 2px solid var(--border-color);
-    background: var(--bg-secondary);
-    display: flex;
-    flex-direction: column;
+  .idx-list li:first-child .idx-row {
+    border-top: 2px solid var(--line);
   }
 
-  .project-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 0;
+  .idx-no {
+    color: var(--accent);
   }
 
-  .project-card.gradient-1::before {
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
+  .idx-title {
+    font-weight: 700;
+    color: var(--ink);
   }
 
-  .project-card.gradient-2::before {
-    background: linear-gradient(135deg, rgba(247, 147, 30, 0.1), rgba(255, 210, 63, 0.1));
+  .idx-row:hover .idx-title {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.22em;
   }
 
-  .project-card.gradient-3::before {
-    background: linear-gradient(135deg, rgba(255, 210, 63, 0.1), rgba(255, 107, 53, 0.1));
-  }
-
-  .project-card.gradient-4::before {
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 210, 63, 0.15));
-  }
-
-  .project-card.gradient-5::before {
-    background: linear-gradient(135deg, rgba(247, 147, 30, 0.15), rgba(255, 107, 53, 0.15));
-  }
-
-  .project-card.gradient-6::before {
-    background: linear-gradient(135deg, rgba(255, 210, 63, 0.15), rgba(247, 147, 30, 0.15));
-  }
-
-  .project-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-primary);
-  }
-
-  .project-card:hover::before {
-    opacity: 1;
-  }
-
-  .project-content {
-    position: relative;
-    z-index: 1;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .project-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.75rem;
-    gap: 1rem;
-  }
-
-  .project-header h3 {
-    font-size: 1.5rem;
-    color: var(--text-primary);
-    margin: 0;
-    line-height: 1.3;
-  }
-
-  .status-badge {
-    padding: 0.375rem 0.875rem;
-    border-radius: 50px;
-    font-size: 0.875rem;
-    font-weight: 600;
+  .idx-tier,
+  .idx-year {
+    color: var(--ink-3);
     white-space: nowrap;
   }
 
-  .status-badge.live {
-    background: rgba(76, 175, 80, 0.15);
-    color: #4caf50;
-    border: 1px solid #4caf50;
+  @media (max-width: 600px) {
+    .idx-row {
+      grid-template-columns: 3rem minmax(0, 1fr) auto;
+    }
+
+    .idx-tier {
+      display: none;
+    }
   }
 
-  .status-badge.developing {
-    background: rgba(255, 152, 0, 0.15);
-    color: #ff9800;
-    border: 1px solid #ff9800;
+  /* ---- 02 / featured ---- */
+  .feat-list {
+    display: grid;
   }
 
-  .status-badge.planned {
-    background: rgba(33, 150, 243, 0.15);
-    color: #2196f3;
-    border: 1px solid #2196f3;
+  .feat-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4) var(--space-8);
+    padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    border-top: 1px solid var(--line-soft);
   }
 
-  .status-badge.completed {
-    background: rgba(76, 175, 80, 0.15);
-    color: #4caf50;
-    border: 1px solid #4caf50;
+  .feat-item:first-child {
+    border-top: none;
+    padding-top: 0;
   }
 
-  .status-badge.ongoing {
-    background: rgba(156, 39, 176, 0.15);
-    color: #9c27b0;
-    border: 1px solid #9c27b0;
+  @media (min-width: 900px) {
+    .feat-item {
+      grid-template-columns: minmax(4.5rem, 8rem) minmax(0, 1fr) minmax(8rem, 12rem);
+    }
   }
 
-  .project-description {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    margin-bottom: 1rem;
-    flex: 1;
-    line-height: 1.6;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
+  .feat-num {
+    line-height: 0.9;
   }
 
-  .project-tags {
+  .feat-title {
+    font-size: var(--text-h2);
+    letter-spacing: -0.015em;
+  }
+
+  .feat-result {
+    margin-top: var(--space-4);
+    font-size: 1.185rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ink);
+    max-width: 44ch;
+    text-wrap: balance;
+  }
+
+  .feat-desc {
+    margin-top: var(--space-4);
+    color: var(--ink-2);
+  }
+
+  .feat-links {
+    list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-6);
   }
 
-  .tag {
-    padding: 0.375rem 0.875rem;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    transition: all 0.3s ease;
+  .feat-links a,
+  .row-links a {
+    display: inline-block;
+    padding-block: 0.55rem;
+    margin-block: -0.4rem;
   }
 
-  .project-card:hover .tag {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+  .feat-meta {
+    color: var(--ink-3);
+    text-align: left;
   }
 
-  .project-links {
+  @media (min-width: 900px) {
+    .feat-meta {
+      text-align: right;
+      padding-top: 0.5rem;
+    }
+  }
+
+  @media (max-width: 899.98px) {
+    .feat-num {
+      font-size: 2rem;
+      line-height: 1;
+    }
+  }
+
+  /* ---- 03 / shipped ---- */
+  .row-list {
+    list-style: none;
+    border-bottom: 2px solid var(--line);
+  }
+
+  .row-item {
+    padding-block: var(--space-6);
+    border-top: 2px solid var(--line);
+  }
+
+  .row-head {
     display: flex;
-    gap: 1rem;
-    margin-top: auto;
-  }
-
-  .project-date {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-    font-weight: 500;
-  }
-
-  .project-footer {
-    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
     justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
-    padding-top: 1rem;
+    gap: var(--space-3) var(--space-6);
   }
 
-  .view-more {
-    color: var(--color-primary);
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-  }
-
-  .project-card:hover .view-more {
-    gap: 0.75rem;
-  }
-
-  .team-badge {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    background: var(--bg-tertiary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    border: 1px solid var(--border-color);
-  }
-
-  /* CTA Section */
-  .cta-section {
-    background: var(--bg-secondary);
-  }
-
-  .cta-content {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-
-  .cta-content h2 {
-    margin-bottom: 1rem;
-  }
-
-  .cta-content p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
-
-  .cta-buttons {
+  .row-links {
+    list-style: none;
     display: flex;
-    gap: 1rem;
-    justify-content: center;
     flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
   }
 
-  /* Responsive Design */
-  @media (max-width: 1024px) {
-    .projects-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  .row-desc {
+    margin-top: var(--space-3);
+    color: var(--ink-2);
+  }
 
-    .project-card {
-      min-height: 400px;
+  .row-date {
+    margin-top: var(--space-3);
+    color: var(--ink-3);
+  }
+
+  /* ---- 04 / archive ---- */
+  .sec-intro {
+    color: var(--ink-2);
+    margin-bottom: clamp(2rem, 1rem + 3vw, 3rem);
+  }
+
+  .arc-list {
+    list-style: none;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .arc-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1) var(--space-6);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--line-soft);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  @media (min-width: 768px) {
+    .arc-row {
+      grid-template-columns: 13rem minmax(0, 1fr) auto;
+      align-items: baseline;
     }
   }
 
-  @media (max-width: 768px) {
-    .projects-hero {
-      padding: 6rem 0 3rem;
-    }
+  .arc-title {
+    font-weight: 700;
+    color: var(--ink);
+  }
 
-    .projects-grid {
-      grid-template-columns: 1fr;
-    }
+  .arc-row:hover .arc-title {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.22em;
+  }
 
-    .project-card {
-      min-height: 360px;
-    }
+  .arc-desc {
+    font-size: var(--text-small);
+    color: var(--ink-2);
+    max-width: var(--measure);
+  }
 
-    .cta-buttons {
-      flex-direction: column;
-    }
-
-    .cta-buttons .btn {
-      width: 100%;
-    }
+  .arc-meta {
+    color: var(--ink-3);
+    white-space: nowrap;
   }
 </style>

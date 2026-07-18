@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactForm from '../components/ContactForm.astro';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch with Nathan Lemma — systems for machine learning; backend, data & systems."
+>
+  <section class="section">
+    <div class="container contact-wrap">
+      <div class="sec-head">
+        <span class="sec-label">Contact</span>
+        <span class="sec-aside">replies within 48h</span>
+      </div>
+
+      <h1 class="contact-h">Let's talk.</h1>
+      <p class="contact-intro lede">
+        Hiring for a systems role, weighing research fit, or just want to talk GPU
+        scheduling? Send a note — I read everything.
+      </p>
+
+      <ul class="pin-list">
+        <li>
+          <a class="pin-row" href="mailto:nlemma@utexas.edu">
+            <span class="pin-label">Email</span>
+            <span class="label pin-value">nlemma@utexas.edu</span>
+            <span class="pin-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+        <li>
+          <a class="pin-row" href="https://github.com/Code-Tomato">
+            <span class="pin-label">GitHub</span>
+            <span class="label pin-value">github.com/Code-Tomato</span>
+            <span class="pin-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+        <li>
+          <a class="pin-row" href="https://linkedin.com/in/nathanylemma">
+            <span class="pin-label">LinkedIn</span>
+            <span class="label pin-value">linkedin.com/in/nathanylemma</span>
+            <span class="pin-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="contact-form-wrap">
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-wrap { max-width: 52rem; }
+  .contact-h { margin-top: var(--space-6); }
+  .contact-intro { margin-top: var(--space-4); max-width: 52ch; }
+
+  .pin-list {
+    list-style: none;
+    margin-top: var(--space-12);
+    border-bottom: 1.5px solid var(--line-soft);
+  }
+  .pin-row {
+    display: grid;
+    grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-top: 1.5px solid var(--line-soft);
+    text-decoration: none;
+    color: inherit;
+  }
+  .pin-label { font-weight: 700; letter-spacing: 0.01em; color: var(--ink); }
+  .pin-value { color: var(--ink-2); overflow-wrap: anywhere; text-transform: none; letter-spacing: 0.02em; }
+  .pin-arrow { font-size: 1.25rem; font-weight: 700; color: var(--accent); transition: translate 120ms var(--ease); }
+  .pin-row:hover .pin-label { color: var(--accent); }
+  .pin-row:hover .pin-arrow { translate: 4px 0; }
+
+  @media (max-width: 480px) {
+    .pin-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .pin-value { grid-column: 1; grid-row: 2; }
+    .pin-arrow { grid-row: 1 / span 2; align-self: center; }
+  }
+
+  .contact-form-wrap { margin-top: var(--space-12); max-width: 46rem; }
+</style>
