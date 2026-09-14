@@ -127,6 +127,11 @@ const secRelated = seeAlso.length > 0 ? nn() : null;
 
 <style>
   .detail {
+    /* Opaque slab like .section — otherwise the fixed gradient shows
+       through under dark ink and the page is unreadable. */
+    position: relative;
+    background: var(--paper);
+    box-shadow: 0 -26px 54px -26px var(--slab-sh), 0 26px 54px -26px var(--slab-sh);
     padding-block: clamp(2.5rem, 1.5rem + 3vw, 4rem) var(--section-pad);
   }
 

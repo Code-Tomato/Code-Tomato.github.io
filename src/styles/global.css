@@ -360,6 +360,13 @@ a:hover { color: var(--accent); }
 }
 .section-gray { background: var(--paper-2); }
 
+/* Inner-page heads and compact sections were transparent, so the gradient
+   showed through under dark ink text (unreadable in light mode). Make them
+   opaque white slabs like .section. */
+.page-head,
+.section-tight { position: relative; background: var(--paper); }
+.page-head { box-shadow: 0 -26px 54px -26px var(--slab-sh), 0 26px 54px -26px var(--slab-sh); }
+
 /* Window sections reveal the gradient (hero, contact) */
 .section-window {
   position: relative;

@@ -9,15 +9,15 @@ import type { ExperienceEntry } from '../data/experience';
 const narrative: { eras: string[]; text: string }[] = [
   {
     eras: ['2023 · FSAE bench', '2024 · Caterpillar'],
-    text: `I started at the bottom of the stack. On UT's Formula SAE team I led battery-management system design: RTOS firmware and a state-of-charge algorithm that kept range estimates within 5%. Then Caterpillar, where I built HAL and API layers for engine control modules, code that's in production today.`,
+    text: `On UT's Formula SAE team I led battery-management system design: RTOS firmware and a state-of-charge algorithm that kept range estimates within 5%. At Caterpillar I built HAL and API layers for engine control modules, which is now in production.`,
   },
   {
     eras: ['2025 · kernels & concurrency'],
-    text: `The questions kept outgrowing the microcontroller. I built out Pintos (user processes, syscalls, virtual memory, a file system) and wrote an instruction-accurate RISC-V simulator for UT's Primate compiler research. Then concurrency: hash tables and radix trees pushed past 88 million operations per second, where I found that tail latency on real LLM traffic ran 40× worse than random benchmarks suggested.`,
+    text: `I built out Pintos (user processes, syscalls, virtual memory, and a file system) and wrote an instruction-accurate RISC-V simulator for UT's Primate compiler research. I also benchmarked concurrent hash tables and radix trees, which reached over 88 million operations per second. On real LLM traffic, their tail latency was about 40× worse than random benchmarks suggested.`,
   },
   {
     eras: ["2026 · SOSP '26"],
-    text: `At UT Austin I work on systems for ML: GPU scheduling that treats energy as a first-class resource. My part: designing and testing the multi-GPU serving baselines (GPUlets and USHER, rebuilt from their papers) that a SOSP '26 paper's evaluation stands on. Making the comparison fair took hundreds of hours. At Caterpillar, I'm on my third team in two years, building data tooling in .NET and AWS Lambda that replaces manual processes with measured, automated ones.`,
+    text: `At UT Austin I work on systems for ML: GPU scheduling that treats energy as a first-class resource. I designed and tested the multi-GPU serving baselines (GPUlets and USHER, reimplemented from their papers) used in a SOSP '26 paper's evaluation. At Caterpillar I'm on my third team in two years, building data tooling in .NET and AWS Lambda to replace manual processes.`,
   },
 ];
 
@@ -233,8 +233,7 @@ const coursework = [
       </div>
       <div class="prose">
         <p>
-          Away from the terminal I play percussion and bike around Austin, which in practice means a lot of
-          drum tuning and derailleur adjustment.
+          Away from work I play percussion and bike around Austin.
         </p>
       </div>
     </div>
@@ -246,7 +245,7 @@ const coursework = [
       <hr class="rule-heavy" aria-hidden="true" />
       <div class="cta-row">
         <a href="/projects" class="btn btn-primary">Explore the work</a>
-        <a href="/#contact" class="btn btn-secondary">Get in touch</a>
+        <a href="/contact" class="btn btn-secondary">Get in touch</a>
       </div>
     </div>
   </section>

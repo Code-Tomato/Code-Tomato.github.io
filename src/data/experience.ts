@@ -24,7 +24,7 @@ export interface SkillGroup {
 export const publication: Publication = {
   venue: "SOSP '26",
   note: 'to appear',
-  line: "Contributor to EnerTune, a paper on energy-efficient multi-tenant GPU inference serving from UT Austin's systems-for-ML group — I designed and tested the baseline serving systems its evaluation runs against. More once it's published."
+  line: "I contributed to EnerTune, a paper on energy-efficient multi-tenant GPU inference serving from UT Austin's systems-for-ML group. I designed and tested the baseline serving systems used in its evaluation. More details once it's published."
 };
 
 export const experience: ExperienceEntry[] = [

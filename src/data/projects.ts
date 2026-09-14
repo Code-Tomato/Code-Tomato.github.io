@@ -40,7 +40,7 @@ export const projects: Project[] = [
     description:
       "Faithful reimplementations of two published multi-tenant GPU inference serving systems — GPUlets and USHER — built as the evaluation baselines for a SOSP '26 paper.",
     longDescription:
-      "The paper's evaluation needed baselines it could trust, so I rebuilt GPUlets and USHER, two published multi-tenant GPU serving systems, from their papers: scheduling policies, GPU partitioning, and serving paths, validated against the published behavior. I spent hundreds of hours designing, testing, and hardening them on shared multi-GPU hardware so the comparison would be fair and reproducible. They are the comparison floor for a UT Austin systems-for-ML paper accepted to SOSP '26.",
+      "I reimplemented GPUlets and USHER, two published multi-tenant GPU serving systems, from their papers: scheduling policies, GPU partitioning, and serving paths, validated against the published behavior. I spent hundreds of hours designing and testing them on shared multi-GPU hardware to keep the comparison fair and reproducible. They are the evaluation baselines for a UT Austin systems-for-ML paper accepted to SOSP '26.",
     date: '2026-06',
     dateDisplay: 'Fall 2025 - Spring 2026',
     tags: [
@@ -64,8 +64,8 @@ export const projects: Project[] = [
       'Both reimplementations public: sus-gpus-baselines and UsherRemake'
     ],
     impact:
-      "Baseline design and testing that a SOSP '26 evaluation stands on — done as an undergraduate RA in UT Austin's ECE systems-for-ML group.",
-    headline: "Two published serving systems rebuilt from their papers — the comparison floor for a SOSP '26 evaluation",
+      "Baseline design and testing for a SOSP '26 evaluation, done as an undergraduate research assistant in UT Austin's ECE systems-for-ML group.",
+    headline: "GPUlets and USHER reimplemented from their papers as the evaluation baselines for a SOSP '26 paper",
     teamProject: true,
     pid: 1,
     manSection: 1,
@@ -112,7 +112,7 @@ export const projects: Project[] = [
     description:
       'A C++17 benchmarking suite that puts five concurrent hash tables and two concurrent radix trees on the same footing, under both synthetic and LLM-derived prefix-caching workloads.',
     longDescription:
-      'Most concurrent data-structure benchmarks stop at synthetic traffic; CHT-Radix asks whether the rankings change when the workload looks like a real LLM prefix cache. We implemented five hash-table variants (coarse and fine chaining, optimistic and striped cuckoo, hopscotch) and two radix trees behind one interface, then replayed a ShareGPT-derived trace against them. Peak throughput hit 88.36M ops/sec — a 13× gain over the coarse-locked baseline — while the real trace exposed p99 tail latencies up to 40× worse than random keys.',
+      'Most concurrent data-structure benchmarks use only synthetic traffic. CHT-Radix tests whether the rankings change under a workload that resembles a real LLM prefix cache. We implemented five hash-table variants (coarse and fine chaining, optimistic and striped cuckoo, hopscotch) and two radix trees behind one interface, then replayed a ShareGPT-derived trace against them. Peak throughput reached 88.36M ops/sec, a 13× gain over the coarse-locked baseline, and the real trace exposed p99 tail latencies up to 40× worse than random keys.',
     date: '2026-05',
     dateDisplay: 'Spring 2026',
     tags: ['C++', 'Concurrency', 'Multicore', 'Data Structures', 'Benchmarking', 'LLM Caching'],
