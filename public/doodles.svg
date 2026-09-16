@@ -1,0 +1,376 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1800" viewBox="0 0 2400 1800"
+     fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+  <!--
+    The doodle field. Used as a CSS alpha mask on .doodle-field::before, so the
+    colour here is meaningless and currentColor would be a silent no-op (an
+    image document inherits nothing from the page). Black for previewing.
+
+    1 SVG unit = 1 CSS pixel: the tile is authored directly in final pixel
+    space via mask-size: 2400px 1800px.
+
+    x = 1200 is the centre of the text column. Quiet band (the 64rem column):
+    x 688..1712 — only low-weight marks in there.
+
+    The tile repeats vertically, so nothing may cross y = 0 or y = 1800;
+    every bounding box sits inside 10..1790 after rotation.
+
+    Each doodle is one <g transform="translate(x y) rotate(d) scale(s)"> with
+    stroke-width = target_px / s, so strokes land at an absolute 2.5 / 3.0 /
+    3.6 px regardless of how far the drawing is scaled. Absolute, not the
+    house 2%-of-viewBox rule: at 2% a 60px doodle gets a 0.8px stroke, which
+    is thinner than a dot-grid dot and merges the two layers into grey mush.
+
+    No centre sits on a multiple of 28 — phase-locking with the dot lattice
+    would make the doodles and the grid read as one texture at any alpha.
+
+    Placement, by distance from x=1200 (a tube of width W shows the band
+    x = 1200 ± W/2, so the further out, the wider the window has to be).
+    The artifacts sit innermost; the older drawings and the arrow sit out
+    wide; seven low-weight echoes and four faint letters sit under the text
+    column so a laptop that exactly fits the content still has something.
+
+    The letters are real Noto Sans Ethiopic outlines pulled with fontTools,
+    not traced: a mask is its own document with no font context, so <text>
+    here would fall back to a wrong glyph or nothing at all.
+  -->
+
+  <!-- RISC-V pipeline: IF ID EX MEM WB, EX struck out and redrawn -->
+  <g transform="translate(1751 1523) rotate(3)" stroke-width="3" stroke-opacity="0.95">
+    <rect x="0" y="22" width="34" height="26" rx="3" />
+    <rect x="42" y="22" width="34" height="26" rx="3" />
+    <rect x="84" y="22" width="34" height="26" rx="3" />
+    <rect x="126" y="22" width="40" height="26" rx="3" />
+    <rect x="174" y="22" width="34" height="26" rx="3" />
+    <!-- the stage that was wrong, struck through -->
+    <path d="M86 46 L116 24" stroke-width="2.5" />
+    <path d="M86 24 L116 46" stroke-width="2.5" />
+    <!-- and redrawn above with an arrow back down into place -->
+    <rect x="84" y="-18" width="34" height="26" rx="3" stroke-opacity="0.8" />
+    <path d="M101 10 L101 18" stroke-width="2.5" />
+    <path d="M97 13 L101 19 L105 13" stroke-width="2.5" />
+    <!-- the flow -->
+    <path d="M34 35 L42 35" stroke-width="2.5" />
+    <path d="M76 35 L84 35" stroke-width="2.5" />
+    <path d="M118 35 L126 35" stroke-width="2.5" />
+    <path d="M166 35 L174 35" stroke-width="2.5" />
+  
+  </g>
+
+  <!-- CRT set with an on-switch: the mode this page is not -->
+  <g transform="translate(1787 1031) rotate(4)" stroke-width="3" stroke-opacity="0.95">
+    <rect x="0" y="0" width="96" height="70" rx="9" />
+    <rect x="11" y="10" width="74" height="44" rx="7" stroke-width="2.5" stroke-opacity="0.72" />
+    <!-- the chin and its switch -->
+    <circle cx="78" cy="62" r="4.5" stroke-width="2.5" />
+    <path d="M78 58.5 L78 61.5" stroke-width="2" />
+    <!-- legs -->
+    <path d="M22 70 L17 79" stroke-width="2.5" />
+    <path d="M74 70 L79 79" stroke-width="2.5" />
+    <!-- a scanline or two -->
+    <path d="M20 26 L62 26" stroke-width="2" stroke-opacity="0.5" />
+    <path d="M20 36 L54 36" stroke-width="2" stroke-opacity="0.5" />
+  
+  </g>
+
+  <!-- A100: pixels filled in on the lattice -->
+  <g transform="translate(1789 399) rotate(-4)" stroke="none" fill="#000" fill-opacity="0.9">
+    <!-- die -->
+    <rect x="18" y="18" width="12" height="12" />
+    <rect x="30" y="18" width="12" height="12" />
+    <rect x="42" y="18" width="12" height="12" />
+    <rect x="54" y="18" width="12" height="12" />
+    <rect x="18" y="30" width="12" height="12" />
+    <rect x="54" y="30" width="12" height="12" />
+    <rect x="18" y="42" width="12" height="12" />
+    <rect x="54" y="42" width="12" height="12" />
+    <rect x="18" y="54" width="12" height="12" />
+    <rect x="30" y="54" width="12" height="12" />
+    <rect x="42" y="54" width="12" height="12" />
+    <rect x="54" y="54" width="12" height="12" />
+    <!-- the core, a lighter block -->
+    <rect x="30" y="30" width="24" height="24" fill-opacity="0.38" />
+    <!-- pins, left and right -->
+    <rect x="6" y="24" width="8" height="6" fill-opacity="0.75" />
+    <rect x="6" y="39" width="8" height="6" fill-opacity="0.75" />
+    <rect x="6" y="54" width="8" height="6" fill-opacity="0.75" />
+    <rect x="70" y="24" width="8" height="6" fill-opacity="0.75" />
+    <rect x="70" y="39" width="8" height="6" fill-opacity="0.75" />
+    <rect x="70" y="54" width="8" height="6" fill-opacity="0.75" />
+  
+  </g>
+
+  <!-- Hash buckets, chains, one bucket locked -->
+  <g transform="translate(583 761) rotate(-2)" stroke-width="3" stroke-opacity="0.92">
+    <rect x="0" y="0" width="26" height="22" rx="2" />
+    <rect x="0" y="22" width="26" height="22" rx="2" />
+    <rect x="0" y="44" width="26" height="22" rx="2" />
+    <rect x="0" y="66" width="26" height="22" rx="2" />
+    <!-- chain off bucket 1 -->
+    <path d="M26 11 L44 11" stroke-width="2.5" />
+    <rect x="44" y="1" width="22" height="20" rx="2" stroke-width="2.5" />
+    <path d="M66 11 L84 11" stroke-width="2.5" />
+    <rect x="84" y="1" width="22" height="20" rx="2" stroke-width="2.5" />
+    <!-- chain off bucket 3 -->
+    <path d="M26 55 L44 55" stroke-width="2.5" />
+    <rect x="44" y="45" width="22" height="20" rx="2" stroke-width="2.5" />
+    <!-- the lock on bucket 2 -->
+    <rect x="38" y="29" width="16" height="12" rx="2" stroke-width="2.5" />
+    <path d="M42 29 L42 25 A4 4 0 0 1 50 25 L50 29" stroke-width="2.2" />
+  
+  </g>
+
+  <!-- 944. source 284x104, target 130w -->
+  <g transform="translate(547 213) rotate(-6) scale(0.4577)" stroke-width="7.86" stroke-opacity="0.95">
+    <path d="M17 60 L24 52 C46 47, 70 45, 100 45 L131 21 L169 20 L233 49 L253 58 C259 61, 261 67, 257 72" />
+    <path d="M257 74 L236 74 L231 60 L185 60 L180 74 L102 74 L97 60 L53 60 L48 74 L18 74 C13 73, 11 68, 14 64" />
+    <path d="M137 25 L167 24" stroke-width="5.24" />
+    <path d="M171 22 L182 40" stroke-width="5.24" />
+    <circle cx="75" cy="74" r="15" />
+    <circle cx="208" cy="74" r="15" />
+    <circle cx="75" cy="74" r="5.5" stroke-width="5.24" />
+    <circle cx="208" cy="74" r="5.5" stroke-width="5.24" />
+  
+  </g>
+
+  <!-- UT Tower. 60x150 authored, target 93h -->
+  <g transform="translate(566 1327) rotate(3) scale(0.62)" stroke-width="4.84" stroke-opacity="0.9">
+    <path d="M3 150 L57 150 L57 133 L3 133 Z" />
+    <path d="M13 133 L13 44 M47 133 L47 44" />
+    <path d="M13 96 L47 96" stroke-width="2.2" stroke-opacity="0.6" />
+    <path d="M13 72 L47 72" stroke-width="2.2" stroke-opacity="0.6" />
+    <path d="M11 44 L49 44 L45 31 L15 31 Z" />
+    <circle cx="30" cy="59" r="9" stroke-width="2.4" />
+    <path d="M30 59 L30 53 M30 59 L34 62" stroke-width="2" />
+    <path d="M17 31 L43 31 L43 20 L17 20 Z" stroke-width="2.4" />
+    <path d="M30 20 L30 7" stroke-width="2.4" />
+  </g>
+
+  <!-- Excavator. source 270x170, target 138w -->
+  <g transform="translate(1937 217) rotate(-3) scale(0.5111)" stroke-width="7.04" stroke-opacity="0.9">
+    <path d="M40 126 L118 126 A17 17 0 0 1 118 160 L40 160 A17 17 0 0 1 40 126 Z" />
+    <circle cx="52" cy="143" r="6" stroke-width="5.28" />
+    <circle cx="79" cy="143" r="6" stroke-width="5.28" />
+    <circle cx="106" cy="143" r="6" stroke-width="5.28" />
+    <path d="M46 122 L46 86 L84 86 L92 64 L126 64 L126 122" />
+    <path d="M96 86 L122 86" stroke-width="5.28" />
+    <path d="M124 92 L176 54 L214 84" />
+    <path d="M214 84 L200 122 L236 128" />
+    <path d="M200 122 C204 140, 222 146, 238 140 L236 128" />
+  
+  </g>
+
+  <!-- GPU card. source 280x130, target 124w -->
+  <g transform="translate(1969 903) rotate(-5) scale(0.4429)" stroke-width="6.77" stroke-opacity="0.88">
+    <path d="M46 26 L252 26 L252 92 L46 92 Z" />
+    <path d="M46 16 L30 16 L30 104 L46 104" />
+    <path d="M34 34 L34 50 M34 60 L34 76" stroke-width="5.08" />
+    <circle cx="108" cy="59" r="24" />
+    <circle cx="188" cy="59" r="24" />
+    <circle cx="108" cy="59" r="6" stroke-width="5.08" />
+    <circle cx="188" cy="59" r="6" stroke-width="5.08" />
+    <path d="M92 92 L92 104 M112 92 L112 104 M132 92 L132 104 M152 92 L152 104" stroke-width="5.08" />
+    <path d="M212 14 L246 14 L246 26" stroke-width="5.08" />
+  
+  </g>
+
+  <!-- Hard hat. source 250x150, target 104w -->
+  <g transform="translate(343 1499) rotate(5) scale(0.416)" stroke-width="7.21" stroke-opacity="0.9">
+    <path d="M52 104 C52 58, 76 34, 124 34 C172 34, 196 58, 196 104" />
+    <path d="M110 36 L110 12 L138 12 L138 36" />
+    <path d="M22 104 L228 104" />
+    <path d="M22 104 C22 116, 34 122, 56 122 L194 122 C216 122, 228 116, 228 104" />
+  
+  </g>
+
+  <!-- Plane over a box: the Addis flights and what goes in the hold -->
+  <g transform="translate(311 605) rotate(6)" stroke-width="3" stroke-opacity="0.9">
+    <!-- plane, banking -->
+    <path d="M6 44 L38 30 L30 6 L38 3 L54 26 L76 17 C84 14, 90 18, 88 24 C86 30, 80 33, 74 33 L52 41 L56 62 L48 65 L36 47 L10 52 C4 53, 2 48, 6 44 Z" />
+    <!-- the box below, lid flaps open, ticket poking out -->
+    <g transform="translate(14 76)" stroke-width="2.5" stroke-opacity="0.85">
+      <path d="M0 10 L48 10 L48 44 L0 44 Z" />
+      <path d="M0 10 L10 0 L58 0 L48 10" />
+      <path d="M48 10 L58 0 L58 34 L48 44" />
+      <path d="M30 4 L42 -8 L50 -4 L38 8" stroke-width="2.2" />
+    </g>
+  
+  </g>
+
+  <!-- The arrow that sets off, thinks better of it, and loops -->
+  <g transform="translate(147 963) rotate(-7)" stroke-width="3" stroke-opacity="0.85">
+    <path d="M0 44 C22 44, 40 38, 52 26 C60 18, 58 8, 48 8 C38 8, 34 20, 40 30 C48 44, 66 50, 82 44" />
+    <path d="M74 38 L84 44 L74 50" stroke-width="2.5" />
+  
+  </g>
+
+  <!-- CRT again, smaller, far out -->
+  <g transform="translate(2207 1571) rotate(5) scale(0.68)" stroke-width="4.41" stroke-opacity="0.82">
+    <rect x="0" y="0" width="96" height="70" rx="9" />
+    <rect x="11" y="10" width="74" height="44" rx="7" stroke-width="2.5" stroke-opacity="0.72" />
+    <!-- the chin and its switch -->
+    <circle cx="78" cy="62" r="4.5" stroke-width="2.5" />
+    <path d="M78 58.5 L78 61.5" stroke-width="2" />
+    <!-- legs -->
+    <path d="M22 70 L17 79" stroke-width="2.5" />
+    <path d="M74 70 L79 79" stroke-width="2.5" />
+    <!-- a scanline or two -->
+    <path d="M20 26 L62 26" stroke-width="2" stroke-opacity="0.5" />
+    <path d="M20 36 L54 36" stroke-width="2" stroke-opacity="0.5" />
+  
+  </g>
+
+  <!-- pipeline echo, behind the text -->
+  <g transform="translate(1071 179) rotate(-3) scale(0.8)" stroke-width="3.75" stroke-opacity="0.5">
+    <rect x="0" y="22" width="34" height="26" rx="3" />
+    <rect x="42" y="22" width="34" height="26" rx="3" />
+    <rect x="84" y="22" width="34" height="26" rx="3" />
+    <rect x="126" y="22" width="40" height="26" rx="3" />
+    <rect x="174" y="22" width="34" height="26" rx="3" />
+    <!-- the stage that was wrong, struck through -->
+    <path d="M86 46 L116 24" stroke-width="2.5" />
+    <path d="M86 24 L116 46" stroke-width="2.5" />
+    <!-- and redrawn above with an arrow back down into place -->
+    <rect x="84" y="-18" width="34" height="26" rx="3" stroke-opacity="0.8" />
+    <path d="M101 10 L101 18" stroke-width="2.5" />
+    <path d="M97 13 L101 19 L105 13" stroke-width="2.5" />
+    <!-- the flow -->
+    <path d="M34 35 L42 35" stroke-width="2.5" />
+    <path d="M76 35 L84 35" stroke-width="2.5" />
+    <path d="M118 35 L126 35" stroke-width="2.5" />
+    <path d="M166 35 L174 35" stroke-width="2.5" />
+  
+  </g>
+
+  <!-- hash echo, behind the text -->
+  <g transform="translate(789 1187) rotate(4) scale(0.85)" stroke-width="3.53" stroke-opacity="0.48">
+    <rect x="0" y="0" width="26" height="22" rx="2" />
+    <rect x="0" y="22" width="26" height="22" rx="2" />
+    <rect x="0" y="44" width="26" height="22" rx="2" />
+    <rect x="0" y="66" width="26" height="22" rx="2" />
+    <!-- chain off bucket 1 -->
+    <path d="M26 11 L44 11" stroke-width="2.5" />
+    <rect x="44" y="1" width="22" height="20" rx="2" stroke-width="2.5" />
+    <path d="M66 11 L84 11" stroke-width="2.5" />
+    <rect x="84" y="1" width="22" height="20" rx="2" stroke-width="2.5" />
+    <!-- chain off bucket 3 -->
+    <path d="M26 55 L44 55" stroke-width="2.5" />
+    <rect x="44" y="45" width="22" height="20" rx="2" stroke-width="2.5" />
+    <!-- the lock on bucket 2 -->
+    <rect x="38" y="29" width="16" height="12" rx="2" stroke-width="2.5" />
+    <path d="M42 29 L42 25 A4 4 0 0 1 50 25 L50 29" stroke-width="2.2" />
+  
+  </g>
+
+  <!-- arrow echo, behind the text -->
+  <g transform="translate(1379 1627) rotate(8) scale(0.9)" stroke-width="3.33" stroke-opacity="0.44">
+    <path d="M0 44 C22 44, 40 38, 52 26 C60 18, 58 8, 48 8 C38 8, 34 20, 40 30 C48 44, 66 50, 82 44" />
+    <path d="M74 38 L84 44 L74 50" stroke-width="2.5" />
+  
+  </g>
+
+  <!-- A100 echo, behind the text -->
+  <g transform="translate(977 1433) rotate(-5) scale(0.72)" stroke="none" fill="#000" fill-opacity="0.46">
+    <!-- die -->
+    <rect x="18" y="18" width="12" height="12" />
+    <rect x="30" y="18" width="12" height="12" />
+    <rect x="42" y="18" width="12" height="12" />
+    <rect x="54" y="18" width="12" height="12" />
+    <rect x="18" y="30" width="12" height="12" />
+    <rect x="54" y="30" width="12" height="12" />
+    <rect x="18" y="42" width="12" height="12" />
+    <rect x="54" y="42" width="12" height="12" />
+    <rect x="18" y="54" width="12" height="12" />
+    <rect x="30" y="54" width="12" height="12" />
+    <rect x="42" y="54" width="12" height="12" />
+    <rect x="54" y="54" width="12" height="12" />
+    <!-- the core, a lighter block -->
+    <rect x="30" y="30" width="24" height="24" fill-opacity="0.38" />
+    <!-- pins, left and right -->
+    <rect x="6" y="24" width="8" height="6" fill-opacity="0.75" />
+    <rect x="6" y="39" width="8" height="6" fill-opacity="0.75" />
+    <rect x="6" y="54" width="8" height="6" fill-opacity="0.75" />
+    <rect x="70" y="24" width="8" height="6" fill-opacity="0.75" />
+    <rect x="70" y="39" width="8" height="6" fill-opacity="0.75" />
+    <rect x="70" y="54" width="8" height="6" fill-opacity="0.75" />
+  
+  </g>
+
+  <!-- CRT echo, behind the text -->
+  <g transform="translate(1319 691) rotate(6) scale(0.6)" stroke-width="5" stroke-opacity="0.46">
+    <rect x="0" y="0" width="96" height="70" rx="9" />
+    <rect x="11" y="10" width="74" height="44" rx="7" stroke-width="2.5" stroke-opacity="0.72" />
+    <!-- the chin and its switch -->
+    <circle cx="78" cy="62" r="4.5" stroke-width="2.5" />
+    <path d="M78 58.5 L78 61.5" stroke-width="2" />
+    <!-- legs -->
+    <path d="M22 70 L17 79" stroke-width="2.5" />
+    <path d="M74 70 L79 79" stroke-width="2.5" />
+    <!-- a scanline or two -->
+    <path d="M20 26 L62 26" stroke-width="2" stroke-opacity="0.5" />
+    <path d="M20 36 L54 36" stroke-width="2" stroke-opacity="0.5" />
+  
+  </g>
+
+  <!-- hard hat echo, behind the text -->
+  <g transform="translate(883 383) rotate(-4) scale(0.5)" stroke-width="6" stroke-opacity="0.44">
+    <path d="M52 104 C52 58, 76 34, 124 34 C172 34, 196 58, 196 104" />
+    <path d="M110 36 L110 12 L138 12 L138 36" />
+    <path d="M22 104 L228 104" />
+    <path d="M22 104 C22 116, 34 122, 56 122 L194 122 C216 122, 228 116, 228 104" />
+  
+  </g>
+
+  <!-- excavator echo, behind the text -->
+  <g transform="translate(1437 1151) rotate(3) scale(0.34)" stroke-width="8.8" stroke-opacity="0.42">
+    <path d="M40 126 L118 126 A17 17 0 0 1 118 160 L40 160 A17 17 0 0 1 40 126 Z" />
+    <circle cx="52" cy="143" r="6" stroke-width="5.28" />
+    <circle cx="79" cy="143" r="6" stroke-width="5.28" />
+    <circle cx="106" cy="143" r="6" stroke-width="5.28" />
+    <path d="M46 122 L46 86 L84 86 L92 64 L126 64 L126 122" />
+    <path d="M96 86 L122 86" stroke-width="5.28" />
+    <path d="M124 92 L176 54 L214 84" />
+    <path d="M214 84 L200 122 L236 128" />
+    <path d="M200 122 C204 140, 222 146, 238 140 L236 128" />
+  
+  </g>
+
+  <!-- አ -->
+  <g transform="translate(1631 611) rotate(-5) scale(1.0400)" stroke="none" fill="#000" fill-opacity="0.55">
+    <path d="M5.5 100.0 24.3 54.3Q15.200000000000001 54.0 10.65 49.65Q6.1000000000000005 45.3 6.1000000000000005 36.3V28.700000000000003H15.200000000000001V35.5Q15.200000000000001 42.0 17.700000000000003 44.2Q20.200000000000003 46.4 25.400000000000002 46.4H37.1L31.1 61.4Q36.7 63.5 41.300000000000004 67.95Q45.900000000000006 72.4 48.900000000000006 80.15Q51.900000000000006 87.9 52.800000000000004 100.0H43.7Q43.2 90.9 41.0 84.9Q38.800000000000004 78.9 35.400000000000006 75.25Q32.0 71.6 27.8 69.5L15.600000000000001 100.0Z" />
+  </g>
+
+  <!-- ለ -->
+  <g transform="translate(423 1063) rotate(4) scale(0.8600)" stroke="none" fill="#000" fill-opacity="0.52">
+    <path d="M4.3 100.0Q5.6000000000000005 85.7 7.550000000000001 75.85Q9.5 66.0 12.350000000000001 59.599999999999994Q15.200000000000001 53.199999999999996 19.400000000000002 49.55Q23.6 45.9 29.5 44.099999999999994L24.700000000000003 28.599999999999994H34.4L56.5 100.0H47.0L31.900000000000002 51.4Q28.1 52.3 25.1 54.949999999999996Q22.1 57.599999999999994 19.8 63.0Q17.5 68.4 15.850000000000001 77.4Q14.200000000000001 86.4 13.100000000000001 100.0Z" />
+  </g>
+
+  <!-- መ -->
+  <g transform="translate(1853 1289) rotate(6) scale(0.9200)" stroke="none" fill="#000" fill-opacity="0.5">
+    <path d="M25.900000000000002 101.0Q15.8 101.0 11.4 92.75Q7.0 84.5 7.0 68.8Q7.0 56.8 9.95 47.75Q12.9 38.699999999999996 18.7 33.64999999999999Q24.5 28.599999999999994 32.9 28.599999999999994H69.0Q79.30000000000001 28.599999999999994 84.10000000000001 36.55Q88.9 44.5 88.9 60.3Q88.9 76.0 83.95 84.35Q79.0 92.7 69.0 92.7H55.300000000000004V35.599999999999994H44.2V89.7Q41.0 94.7 36.6 97.85Q32.2 101.0 25.900000000000002 101.0ZM26.3 93.7Q31.700000000000003 93.7 35.1 88.7V35.599999999999994H33.7Q25.200000000000003 35.599999999999994 20.55 43.8Q15.9 52.0 15.9 68.5Q15.9 81.7 18.7 87.7Q21.5 93.7 26.3 93.7ZM64.4 85.5H67.7Q72.5 85.5 75.2 82.45Q77.9 79.4 79.0 73.7Q80.10000000000001 68.0 80.10000000000001 60.199999999999996Q80.10000000000001 53.0 78.95000000000002 47.45Q77.80000000000001 41.9 75.20000000000002 38.75Q72.60000000000001 35.599999999999994 68.2 35.599999999999994H64.4Z" />
+  </g>
+
+  <!-- ሰ -->
+  <g transform="translate(659 1637) rotate(-4) scale(0.7800)" stroke="none" fill="#000" fill-opacity="0.5">
+    <path d="M9.0 100.0V63.9Q9.0 53.8 13.25 47.15Q17.5 40.5 26.400000000000002 39.099999999999994V24.0H35.5V39.0Q44.6 40.199999999999996 48.7 46.64999999999999Q52.800000000000004 53.099999999999994 52.800000000000004 64.1V100.0H43.7V64.6Q43.7 56.0 40.8 51.349999999999994Q37.9 46.699999999999996 31.1 46.699999999999996Q23.6 46.699999999999996 20.85 51.599999999999994Q18.1 56.5 18.1 64.69999999999999V100.0Z" />
+  </g>
+
+  <!-- ቀ -->
+  <g transform="translate(1163 951) rotate(5) scale(0.7000)" stroke="none" fill="#000" fill-opacity="0.34">
+    <path d="M30.1 77.3Q22.3 77.3 17.200000000000003 75.8Q12.100000000000001 74.3 9.200000000000001 71.8Q6.300000000000001 69.3 5.15 66.25Q4.0 63.199999999999996 4.0 60.0Q4.0 55.5 6.15 51.599999999999994Q8.3 47.699999999999996 13.950000000000001 45.3Q19.6 42.9 30.1 42.9H35.0Q45.400000000000006 42.9 51.050000000000004 45.3Q56.7 47.699999999999996 58.900000000000006 51.64999999999999Q61.1 55.599999999999994 61.1 60.0Q61.1 63.0 59.900000000000006 66.05Q58.7 69.1 55.85 71.65Q53.0 74.2 47.900000000000006 75.75Q42.800000000000004 77.3 35.0 77.3ZM30.1 69.8H35.0Q41.900000000000006 69.8 45.550000000000004 68.5Q49.2 67.19999999999999 50.6 65.0Q52.0 62.8 52.0 60.0Q52.0 57.4 50.7 55.25Q49.400000000000006 53.099999999999994 45.7 51.75Q42.0 50.4 35.0 50.4H30.1Q22.8 50.4 19.15 51.75Q15.5 53.099999999999994 14.3 55.3Q13.100000000000001 57.5 13.100000000000001 60.0Q13.100000000000001 62.8 14.450000000000001 65.05Q15.8 67.3 19.5 68.55Q23.200000000000003 69.8 30.1 69.8ZM28.0 100.0V28.599999999999994H37.1V100.0Z" />
+  </g>
+
+  <!-- ተ -->
+  <g transform="translate(905 151) rotate(-6) scale(0.6200)" stroke="none" fill="#000" fill-opacity="0.32">
+    <path d="M25.5 100.0V28.599999999999994H34.6V100.0ZM1.5 61.8 4.9 46.3H55.2L58.6 61.8H56.6Q53.6 61.8 51.2 59.599999999999994Q48.800000000000004 57.39999999999999 47.800000000000004 53.599999999999994H12.3Q11.200000000000001 57.39999999999999 8.850000000000001 59.599999999999994Q6.5 61.8 3.5 61.8Z" />
+  </g>
+
+  <!-- ነ -->
+  <g transform="translate(1493 311) rotate(3) scale(0.7400)" stroke="none" fill="#000" fill-opacity="0.33">
+    <path d="M22.8 100.0V53.8Q14.8 53.5 10.4 49.4Q6.0 45.3 6.0 36.3V28.700000000000003H15.100000000000001V35.5Q15.100000000000001 42.0 17.6 44.2Q20.1 46.4 25.3 46.4H31.900000000000002V100.0Z" />
+  </g>
+
+  <!-- ዘ -->
+  <g transform="translate(1247 1751) rotate(-3) scale(0.5800)" stroke="none" fill="#000" fill-opacity="0.3">
+    <path d="M9.0 100.0V28.599999999999994H18.1V58.8H36.800000000000004V28.599999999999994H45.900000000000006V100.0H36.800000000000004V66.69999999999999H18.1V100.0Z" />
+  </g>
+</svg>

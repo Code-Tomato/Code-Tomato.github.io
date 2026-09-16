@@ -1,13 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-  <style>
-    .stem { stroke: #171311; }
-    @media (prefers-color-scheme: dark) {
-      .stem { stroke: #f0e9e6; }
-    }
-  </style>
-  <!-- The square tomato, PLAKAT edition: muted tomato square
-       (oklch(0.5 0.14 29) ≈ #a43c31), ink stem + leaves -->
-  <path class="stem" d="M8 6 V3" fill="none" stroke-width="1.8" />
-  <path class="stem" d="M8 3.4 L5.2 4.9 M8 3.4 L10.8 4.9" fill="none" stroke-width="1.6" stroke-linecap="square" />
-  <rect x="3.25" y="6" width="9.5" height="9.5" fill="#a43c31" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- The square tomato, CRT edition: hot phosphor body (the site's hot
+       token, pushed a step brighter for a 16px tab icon) and the site's stem
+       green. The green reads on both light and dark tab bars, so no theme
+       switch. No double hyphens in here: standalone SVG is strict XML. -->
+  <rect x="10" y="16" width="28" height="24" rx="2" fill="#ff6a54" />
+  <path d="M20 16 Q24 8 28 16" fill="none" stroke="#46b250" stroke-width="2.4" stroke-linecap="round" />
+  <path d="M17 14 Q24 6 31 14" fill="none" stroke="#46b250" stroke-width="2" stroke-linecap="round" />
 </svg>

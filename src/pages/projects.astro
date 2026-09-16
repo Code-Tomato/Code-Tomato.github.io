@@ -1,68 +1,104 @@
 ---
+import { publication } from '../data/experience';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import {
-  getFeaturedProjects,
-  getCurrentProjects,
-  getArchivedProjects,
-  getProcessTable,
-  type Project
-} from '../data/projects';
+import { projects, getFeaturedProjects } from '../data/projects';
 
 const featured = getFeaturedProjects();
-const current = getCurrentProjects();
-const archived = getArchivedProjects();
-const index = getProcessTable();
+// Everything that isn't featured, in the same order the index uses, so the
+// numbering below picks up where the featured grid leaves off.
+const rest = projects.filter((p) => p.tier !== 'featured');
 
-const nn = (n: number) => String(n).padStart(2, '0');
-const tierLabel: Record<string, string> = {
-  featured: 'Featured',
-  current: 'Shipped',
-  archived: 'Archive',
-};
+// Position in the full project list, so a project keeps one number wherever
+// it appears.
+const nn = (p: { slug: string }) =>
+  String(projects.findIndex((x) => x.slug === p.slug) + 1).padStart(2, '0');
 
-const linkList = (p: Project) => {
-  const out: { href: string; label: string }[] = [];
-  if (p.links.github) out.push({ href: p.links.github, label: 'Repo ↗' });
-  if (p.links.documentation) out.push({ href: p.links.documentation, label: 'Write-up ↗' });
-  if (p.links.paper) out.push({ href: p.links.paper, label: 'Paper ↗' });
-  return out;
-};
-
-const archiveYears = archived.map((p) => Number(p.date.slice(0, 4)));
-const archiveSpan = `${Math.min(...archiveYears)}–${Math.max(...archiveYears)}`;
+const restYears = rest.map((p) => Number(p.date.slice(0, 4)));
+const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
 ---
 
 <BaseLayout
-  title="Work"
-  description="Systems projects with write-ups, repos, and numbers you can check — GPU scheduling, concurrent data structures, kernels, and the archive where it started."
+  title="Projects"
+  description="Twelve projects: a SOSP '26 publication, GPU scheduling, concurrent data structures, an OS kernel, and the hardware I started on."
 >
   <!-- Page head -->
   <section class="page-head">
     <div class="container">
-      <h1 class="display">Work</h1>
+      <div class="sec-head">
+        <span class="sec-label">Projects</span>
+        <span class="sec-aside">12 projects · updated 2026-09</span>
+      </div>
+      <h1 class="display">Papers and detours</h1>
       <p class="lede page-lede">
-        Most projects include a write-up, a repository, and measured results.
+        Write-ups and numbers included. GitHub links sold separately.
       </p>
     </div>
   </section>
 
-  <!-- 01 / INDEX -->
-  <section class="section-tight" aria-labelledby="index-heading">
+
+  <!-- 00 / PUBLICATION. Numbered 00 because it is the bonus track: it sits
+       ahead of the numbered sections rather than inside them. -->
+  <section class="section-tight" aria-labelledby="pub-heading">
+    <div class="container">
+      <div class="sec-head">
+        <span class="sec-index">00</span>
+        <span class="sec-label" id="pub-heading">Publication</span>
+        <span class="sec-aside">{publication.venue} · {publication.note}</span>
+      </div>
+
+      <p class="pub-line">
+        <em class="pub-title">“{publication.title}”</em>, {publication.authorship}.{' '}
+        {publication.line}
+        <span class="pub-links">
+          <a class="link-dir" href={publication.repo}>EnerTune repo ↗</a>
+          <a class="link-dir" href="/projects/serving-baselines">The baselines I built →</a>
+        </span>
+      </p>
+    </div>
+  </section>
+  <!-- 01 / FEATURED -->
+  <section class="section-tight" aria-labelledby="featured-heading">
     <div class="container">
       <div class="sec-head">
         <span class="sec-index">01</span>
-        <span class="sec-label" id="index-heading">Index</span>
-        <span class="sec-aside">12 projects · updated 2026-07</span>
+        <span class="sec-label" id="featured-heading">Featured</span>
+        <span class="sec-aside">current research &amp; systems</span>
+      </div>
+
+      <ul class="card-grid">
+        {
+          featured.map((p) => (
+            <li>
+              <a class="card" href={`/projects/${p.slug}`}>
+                <span class="label card-no">{nn(p)}</span>
+                <h2 class="card-title">{p.title}</h2>
+                <p class="card-desc">{p.summary}</p>
+                <span class="label card-year"><time datetime={p.date}>{p.dateDisplay}</time></span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 02 / EVERYTHING ELSE -->
+  <section class="section-tight" aria-labelledby="rest-heading">
+    <div class="container">
+      <div class="sec-head">
+        <span class="sec-index">02</span>
+        <span class="sec-label" id="rest-heading">Everything else</span>
+        <span class="sec-aside">{restSpan}</span>
       </div>
 
       <ol class="idx-list">
         {
-          index.map((p) => (
+          rest.map((p) => (
             <li>
               <a class="idx-row" href={`/projects/${p.slug}`}>
-                <span class="label idx-no">{nn(p.pid)}</span>
+                <span class="label idx-no">{nn(p)}</span>
                 <span class="idx-title">{p.title}</span>
-                <span class="label idx-tier">{tierLabel[p.tier]}</span>
+                <span class="idx-desc">{p.summary}</span>
                 <span class="label idx-year"><time datetime={p.date}>{p.date.slice(0, 4)}</time></span>
               </a>
             </li>
@@ -71,123 +107,79 @@ const archiveSpan = `${Math.min(...archiveYears)}–${Math.max(...archiveYears)}
       </ol>
     </div>
   </section>
-
-  <!-- 02 / FEATURED -->
-  <section class="section" aria-labelledby="featured-heading">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-index">02</span>
-        <span class="sec-label" id="featured-heading">Featured</span>
-        <span class="sec-aside">current research &amp; systems</span>
-      </div>
-
-      <div class="feat-list">
-        {
-          featured.map((p, i) => (
-            <article class="feat-item">
-              <p class="num feat-num" aria-hidden="true">{nn(i + 1)}</p>
-              <div class="feat-body">
-                <h2 class="feat-title">
-                  <a class="link-quiet" href={`/projects/${p.slug}`}>{p.title}</a>
-                </h2>
-                <p class="feat-result">{p.headline}</p>
-                <p class="feat-desc">{p.longDescription}</p>
-                <ul class="feat-links">
-                  {linkList(p).map((l) => (
-                    <li><a class="link-dir" href={l.href}>{l.label}</a></li>
-                  ))}
-                  <li><a class="link-dir" href={`/projects/${p.slug}`}>Details →</a></li>
-                </ul>
-              </div>
-              <p class="label feat-meta">
-                <time datetime={p.date}>{p.dateDisplay}</time>
-              </p>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- 03 / SHIPPED -->
-  <section class="section section-gray" aria-labelledby="shipped-heading">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-index">03</span>
-        <span class="sec-label" id="shipped-heading">Shipped</span>
-        <span class="sec-aside">2025</span>
-      </div>
-
-      <ul class="row-list">
-        {
-          current.map((p) => (
-            <li class="row-item">
-              <div class="row-head">
-                <h3 class="row-title">
-                  <a class="link-quiet" href={`/projects/${p.slug}`}>{p.title}</a>
-                </h3>
-                <ul class="row-links">
-                  {linkList(p).map((l) => (
-                    <li><a class="link-dir" href={l.href}>{l.label}</a></li>
-                  ))}
-                </ul>
-              </div>
-              <p class="row-desc">{p.description}</p>
-              <p class="label row-date"><time datetime={p.date}>{p.dateDisplay}</time></p>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
-  <!-- 04 / ARCHIVE -->
-  <section class="section" id="archive" aria-labelledby="archive-heading">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-index">04</span>
-        <span class="sec-label" id="archive-heading">Where I started</span>
-        <span class="sec-aside">{archiveSpan}</span>
-      </div>
-
-      <p class="sec-intro">
-        Earlier work: race-car battery systems, a quantum-computing experiment, and a keyboard
-        built from the PCB up. It's all kept here, code included.
-      </p>
-
-      <ul class="arc-list">
-        {
-          archived.map((p) => (
-            <li>
-              <a class="arc-row" href={`/projects/${p.slug}`}>
-                <span class="arc-title">{p.title}</span>
-                <span class="arc-desc">{p.description}</span>
-                <span class="label arc-meta"><time datetime={p.date}>{p.date.slice(0, 4)}</time></span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
 </BaseLayout>
 
 <style>
-  /* ---- page head ---- */
-  .page-head {
-    padding-block: clamp(3rem, 2rem + 4vw, 6rem) clamp(2rem, 1rem + 3vw, 4rem);
+  /* One line, not a paragraph: the global 46ch measure is there to keep prose
+     readable and only breaks this in half. The container still holds it. */
+  .page-lede { max-width: none; }
+
+  /* ---- 00 / the paper ---- */
+  .pub-line {
+    display: block;
+    color: var(--ink-2);
   }
 
-  .page-lede {
-    margin-top: var(--space-4);
-    max-width: 46ch;
+  .pub-title { color: var(--ink); font-style: italic; }
+
+  /* The two links are their own row under the citation. They used to be bare
+     inline-blocks in the paragraph, which let them trail off the last line of
+     prose with no gap whenever the text happened to wrap short. */
+  .pub-links {
+    display: block;
+    margin-top: var(--space-3);
+  }
+  .pub-line .link-dir { margin-right: var(--space-3); }
+
+  /* ---- 01 / featured: one card per project ---- */
+  .card-grid {
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
   }
 
-  .section-tight {
-    padding-block: var(--space-8) var(--section-pad);
+  @media (min-width: 680px) {
+    .card-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
-  /* ---- 01 / index ---- */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: 100%;
+    padding: var(--space-4);
+    border: 1px solid var(--line-2);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card:hover {
+    border-color: color-mix(in oklch, var(--hot) 55%, transparent);
+  }
+
+  .card-no { color: var(--hot); }
+
+  .card-title {
+    font-size: var(--text-h2);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .card:hover .card-title { color: var(--hot); }
+
+  .card-desc {
+    color: var(--ink-2);
+  }
+
+  /* pinned to the bottom so the years line up across a row of uneven cards */
+  .card-year {
+    margin-top: auto;
+    padding-top: var(--space-3);
+    color: var(--ink-3);
+  }
+
+  /* ---- 02 / everything else ---- */
   .idx-list {
     list-style: none;
     border-bottom: 2px solid var(--line);
@@ -195,12 +187,11 @@ const archiveSpan = `${Math.min(...archiveYears)}–${Math.max(...archiveYears)}
 
   .idx-row {
     display: grid;
-    grid-template-columns: 3.5rem minmax(0, 1fr) auto auto;
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
     align-items: baseline;
-    gap: var(--space-4);
-    padding: var(--space-3) 0;
-    min-height: 2.75rem;
-    border-top: 1px solid var(--line-soft);
+    gap: var(--space-1) var(--space-4);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--line-2);
     text-decoration: none;
     color: inherit;
   }
@@ -209,9 +200,7 @@ const archiveSpan = `${Math.min(...archiveYears)}–${Math.max(...archiveYears)}
     border-top: 2px solid var(--line);
   }
 
-  .idx-no {
-    color: var(--accent);
-  }
+  .idx-no { color: var(--hot); }
 
   .idx-title {
     font-weight: 700;
@@ -219,194 +208,29 @@ const archiveSpan = `${Math.min(...archiveYears)}–${Math.max(...archiveYears)}
   }
 
   .idx-row:hover .idx-title {
-    color: var(--accent);
+    color: var(--hot);
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 0.22em;
   }
 
-  .idx-tier,
+  /* second line, under the title. Runs to the row's end rather than stopping
+     at the title column, and drops the 66ch measure cap that was cutting the
+     longer ones short well before that. */
+  .idx-desc {
+    grid-column: 2 / -1;
+    font-size: var(--text-small);
+    color: var(--ink-2);
+  }
+
   .idx-year {
+    grid-row: 1;
+    grid-column: 3;
     color: var(--ink-3);
     white-space: nowrap;
   }
 
   @media (max-width: 600px) {
-    .idx-row {
-      grid-template-columns: 3rem minmax(0, 1fr) auto;
-    }
-
-    .idx-tier {
-      display: none;
-    }
-  }
-
-  /* ---- 02 / featured ---- */
-  .feat-list {
-    display: grid;
-  }
-
-  .feat-item {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4) var(--space-8);
-    padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
-    border-top: 1px solid var(--line-soft);
-  }
-
-  .feat-item:first-child {
-    border-top: none;
-    padding-top: 0;
-  }
-
-  @media (min-width: 900px) {
-    .feat-item {
-      grid-template-columns: minmax(4.5rem, 8rem) minmax(0, 1fr) minmax(8rem, 12rem);
-    }
-  }
-
-  .feat-num {
-    line-height: 0.9;
-  }
-
-  .feat-title {
-    font-size: var(--text-h2);
-    letter-spacing: -0.015em;
-  }
-
-  .feat-result {
-    margin-top: var(--space-4);
-    font-size: 1.185rem;
-    font-weight: 700;
-    line-height: 1.35;
-    color: var(--ink);
-    max-width: 44ch;
-    text-wrap: balance;
-  }
-
-  .feat-desc {
-    margin-top: var(--space-4);
-    color: var(--ink-2);
-  }
-
-  .feat-links {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-6);
-    margin-top: var(--space-6);
-  }
-
-  .feat-links a,
-  .row-links a {
-    display: inline-block;
-    padding-block: 0.55rem;
-    margin-block: -0.4rem;
-  }
-
-  .feat-meta {
-    color: var(--ink-3);
-    text-align: left;
-  }
-
-  @media (min-width: 900px) {
-    .feat-meta {
-      text-align: right;
-      padding-top: 0.5rem;
-    }
-  }
-
-  @media (max-width: 899.98px) {
-    .feat-num {
-      font-size: 2rem;
-      line-height: 1;
-    }
-  }
-
-  /* ---- 03 / shipped ---- */
-  .row-list {
-    list-style: none;
-    border-bottom: 2px solid var(--line);
-  }
-
-  .row-item {
-    padding-block: var(--space-6);
-    border-top: 2px solid var(--line);
-  }
-
-  .row-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-3) var(--space-6);
-  }
-
-  .row-links {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-6);
-  }
-
-  .row-desc {
-    margin-top: var(--space-3);
-    color: var(--ink-2);
-  }
-
-  .row-date {
-    margin-top: var(--space-3);
-    color: var(--ink-3);
-  }
-
-  /* ---- 04 / archive ---- */
-  .sec-intro {
-    color: var(--ink-2);
-    margin-bottom: clamp(2rem, 1rem + 3vw, 3rem);
-  }
-
-  .arc-list {
-    list-style: none;
-    border-bottom: 1px solid var(--line-soft);
-  }
-
-  .arc-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-1) var(--space-6);
-    padding: var(--space-4) 0;
-    border-top: 1px solid var(--line-soft);
-    text-decoration: none;
-    color: inherit;
-  }
-
-  @media (min-width: 768px) {
-    .arc-row {
-      grid-template-columns: 13rem minmax(0, 1fr) auto;
-      align-items: baseline;
-    }
-  }
-
-  .arc-title {
-    font-weight: 700;
-    color: var(--ink);
-  }
-
-  .arc-row:hover .arc-title {
-    color: var(--accent);
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.22em;
-  }
-
-  .arc-desc {
-    font-size: var(--text-small);
-    color: var(--ink-2);
-    max-width: var(--measure);
-  }
-
-  .arc-meta {
-    color: var(--ink-3);
-    white-space: nowrap;
+    .idx-row { grid-template-columns: 3rem minmax(0, 1fr) auto; }
   }
 </style>

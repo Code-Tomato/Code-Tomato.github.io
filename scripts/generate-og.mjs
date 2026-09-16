@@ -1,7 +1,6 @@
-// Generates public/og-image.png (1200x630) in the PLAKAT design language.
-// See DESIGN.md. Self-contained + idempotent: Reddit Sans static TTFs are
-// downloaded into scripts/.fonts/ on first run (satori cannot read the installed
-// variable woff2); Reddit Mono comes from the installed fontsource woff.
+// Generates public/og-image.png (1200x630) in the site's CRT design language.
+// Self-contained + idempotent: static TTFs are downloaded into scripts/.fonts/
+// on first run, because satori cannot read the installed variable woff2.
 import satori from 'satori';
 import { html } from 'satori-html';
 import { Resvg } from '@resvg/resvg-js';
@@ -12,23 +11,23 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FONT_DIR = path.join(__dirname, '.fonts');
 
-// Design tokens (sRGB equivalents of DESIGN.md OKLCH primitives)
-const PLATE = 'rgb(151,47,38)'; // --plate-bg muted tomato
-const PAPER = 'rgb(250,244,242)'; // --paper warm
-const PAPER_DIM = 'rgba(250,244,242,0.82)'; // secondary type on the plate
+// sRGB equivalents of the CRT tokens in src/styles/global.css
+const TUBE = 'rgb(18,21,30)'; //  --bg     deep tube
+const PANEL = 'rgb(29,33,45)'; // --panel  rack unit
+const PHOSPHOR = 'rgb(240,235,220)'; // --ink
+const PHOSPHOR_DIM = 'rgba(240,235,220,0.72)'; // --ink-2
+const HOT = 'rgb(240,96,62)'; //   --hot    tomato
+const AMBER = 'rgb(232,175,74)'; // --amber
 
-async function ensureRedditSansTTFs() {
-  const wanted = [
-    { file: 'reddit-sans-700.ttf', weight: 700 },
-    { file: 'reddit-sans-800.ttf', weight: 800 },
-  ];
+async function ensureTTFs(family, wanted) {
   if (wanted.every((w) => fs.existsSync(path.join(FONT_DIR, w.file)))) {
     return wanted;
   }
   fs.mkdirSync(FONT_DIR, { recursive: true });
   // A curl-like User-Agent makes the css2 API serve truetype URLs.
+  const weights = wanted.map((w) => w.weight).join(';');
   const css = await fetch(
-    'https://fonts.googleapis.com/css2?family=Reddit+Sans:wght@700;800',
+    `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, '+')}:wght@${weights}`,
     { headers: { 'User-Agent': 'curl/7.64.1' } }
   ).then((r) => r.text());
   for (const w of wanted) {
@@ -45,54 +44,45 @@ async function ensureRedditSansTTFs() {
   return wanted;
 }
 
-// 1200x630 poster: muted tomato field, heavy uppercase headline, thick paper
-// rule, mono footer line, the square tomato in paper. No gradients, no curves.
+// 1200x630: the display. Dark tube, phosphor type, one amber rule, the
+// tomato mark glowing hot. Mirrors the homepage — name, role, paper.
 const card = html`
-<div style="display: flex; flex-direction: column; width: 1200px; height: 630px; background: ${PLATE}; padding: 64px 80px 56px 80px;">
-  <!-- Kicker row: name + the square tomato -->
+<div style="display: flex; flex-direction: column; width: 1200px; height: 630px; background: ${TUBE}; padding: 72px 80px 60px 80px;">
   <div style="display: flex; align-items: center; justify-content: space-between;">
-    <div style="display: flex; font-family: 'Reddit Mono'; font-size: 24px; letter-spacing: 0.09em; color: ${PAPER_DIM};">NATHAN LEMMA — ECE, UT AUSTIN</div>
-    <svg width="44" height="44" viewBox="0 0 16 16">
-      <path d="M8 6 V3" fill="none" stroke="${PAPER}" stroke-width="1.8" />
-      <path d="M8 3.4 L5.2 4.9 M8 3.4 L10.8 4.9" fill="none" stroke="${PAPER}" stroke-width="1.6" />
-      <rect x="3.25" y="6" width="9.5" height="9.5" fill="${PAPER}" />
+    <div style="display: flex; font-family: 'IBM Plex Mono'; font-size: 24px; letter-spacing: 0.08em; color: ${PHOSPHOR_DIM};">CODE-TOMATO.GITHUB.IO</div>
+    <svg width="48" height="48" viewBox="0 0 48 48">
+      <rect x="10" y="16" width="28" height="24" rx="2" fill="${HOT}" />
+      <path d="M20 16 Q24 8 28 16" stroke="${PHOSPHOR}" stroke-width="2.4" fill="none" />
+      <path d="M17 14 Q24 6 31 14" stroke="${PHOSPHOR}" stroke-width="2" fill="none" />
     </svg>
   </div>
 
-  <!-- Headline -->
-  <div style="display: flex; margin-top: 56px; max-width: 1040px; font-family: 'Reddit Sans'; font-weight: 800; font-size: 92px; line-height: 0.98; letter-spacing: -0.02em; text-transform: uppercase; color: ${PAPER};">Systems for machine learning, built from the metal up.</div>
+  <div style="display: flex; margin-top: 64px; font-family: 'IBM Plex Mono'; font-weight: 700; font-size: 104px; line-height: 1.05; letter-spacing: -0.01em; color: ${PHOSPHOR};">Nathan Lemma</div>
 
-  <!-- Thick paper rule -->
-  <div style="display: flex; margin-top: auto; height: 6px; background: ${PAPER};"></div>
+  <div style="display: flex; margin-top: 28px; max-width: 900px; font-family: 'Reddit Sans'; font-weight: 400; font-size: 32px; line-height: 1.4; color: ${PHOSPHOR_DIM};">ECE at UT Austin. GPU inference serving in the systems-for-ML group; firmware and data infrastructure at Caterpillar.</div>
 
-  <!-- Mono footer -->
-  <div style="display: flex; margin-top: 20px; justify-content: space-between; font-family: 'Reddit Mono'; font-size: 22px; letter-spacing: 0.06em; color: ${PAPER_DIM};">
-    <div style="display: flex;">SOSP '26 CONTRIBUTOR</div>
-    <div style="display: flex;">CODE-TOMATO.GITHUB.IO</div>
-  </div>
+  <div style="display: flex; margin-top: auto; height: 3px; background: ${AMBER};"></div>
+
+  <div style="display: flex; margin-top: 22px; font-family: 'IBM Plex Mono'; font-size: 22px; letter-spacing: 0.06em; color: ${AMBER};">SOSP '26 · 3RD AUTHOR · ENERTUNE</div>
 </div>
 `;
 
 async function generateOGImage() {
-  const redditSans = await ensureRedditSansTTFs();
+  const sans = await ensureTTFs('Reddit Sans', [{ file: 'reddit-sans-400.ttf', weight: 400 }]);
+  const mono = await ensureTTFs('IBM Plex Mono', [{ file: 'plex-mono-700.ttf', weight: 700 }]);
   const fonts = [
-    ...redditSans.map((w) => ({
+    ...sans.map((w) => ({
       name: 'Reddit Sans',
       data: fs.readFileSync(path.join(FONT_DIR, w.file)),
       weight: w.weight,
       style: 'normal',
     })),
-    {
-      name: 'Reddit Mono',
-      data: fs.readFileSync(
-        path.join(
-          __dirname,
-          '../node_modules/@fontsource/reddit-mono/files/reddit-mono-latin-400-normal.woff'
-        )
-      ),
-      weight: 400,
+    ...mono.map((w) => ({
+      name: 'IBM Plex Mono',
+      data: fs.readFileSync(path.join(FONT_DIR, w.file)),
+      weight: w.weight,
       style: 'normal',
-    },
+    })),
   ];
 
   const svg = await satori(card, {

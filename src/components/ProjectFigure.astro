@@ -1,0 +1,189 @@
+---
+// Hand-drawn figures, one per featured project. Each is real data from
+// that project's results — imagery, not decoration.
+// Callers guard on FIGURE_SLUGS; the frame is rendered here so spacing and
+// padding live in one place.
+export const FIGURE_SLUGS = ['serving-baselines', 'cht-radix', 'mllm-energy', 'pintos'];
+
+export interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<figure class="fig-frame">
+
+{
+  slug === 'serving-baselines' && (
+    <svg
+      class="fig fig-sm"
+      viewBox="0 0 340 226"
+      role="img"
+      aria-label="Four published GPU-sharing serving systems (GPULets, Usher, FGD and ParvaGPU) are rebuilt from their papers, ported onto a 16-A100 cluster, and profiled to validate EnerTune."
+    >
+      {/* the four papers */}
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M12 14 h72 v26 h-72 Z" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M12 62 h72 v26 h-72 Z" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M12 110 h72 v26 h-72 Z" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M12 158 h72 v26 h-72 Z" />
+      <text x="20" y="31">gpulets</text>
+      <text x="20" y="79">usher</text>
+      <text x="20" y="127">fgd</text>
+      <text x="20" y="175">parvagpu</text>
+
+      {/* gathered onto one bus */}
+      <path class="s-muted" vector-effect="non-scaling-stroke" d="M84 27 h24 M84 75 h24 M84 123 h24 M84 171 h24 M108 27 V171" />
+      <path class="s-hot" vector-effect="non-scaling-stroke" d="M108 99 h34" />
+      <rect class="nd" x="106" y="25" width="4" height="4" />
+      <rect class="nd" x="106" y="73" width="4" height="4" />
+      <rect class="nd" x="106" y="121" width="4" height="4" />
+      <rect class="nd" x="106" y="169" width="4" height="4" />
+
+      {/* rebuilt, then ported to the cluster */}
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M142 76 h76 v46 h-76 Z" />
+      <text x="180" y="94" text-anchor="middle">rebuilt +</text>
+      <text x="180" y="110" text-anchor="middle">ported</text>
+
+      <path class="s-hot" vector-effect="non-scaling-stroke" d="M218 99 h28" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M246 62 h82 v74 h-82 Z" />
+      <text x="287" y="88" text-anchor="middle">16 × A100</text>
+      <path class="s-muted" vector-effect="non-scaling-stroke" d="M258 100 h58 M258 110 h58 M258 120 h38" />
+      <rect class="nd-hot" x="244" y="97" width="4" height="4" />
+
+      {/* what the cluster produced */}
+      <text class="t-major" x="170" y="208" text-anchor="middle">1.4–2.3× lower energy</text>
+      <text class="t-muted" x="170" y="222" text-anchor="middle">4 baselines profiled · 7.3× less profiling time</text>
+    </svg>
+  )
+}
+
+{
+  slug === 'cht-radix' && (
+    <svg
+      class="fig"
+      viewBox="0 0 480 260"
+      role="img"
+      aria-label="Throughput plot: the fine-grained curve climbs to 88.36 million operations per second, 13 times above the dashed coarse-locked baseline."
+    >
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M36 28 v192 h420" />
+      <path class="s-pen dashed" vector-effect="non-scaling-stroke" d="M36 208 C 140 206, 240 200, 400 196" />
+      <path class="s-hot" vector-effect="non-scaling-stroke" d="M36 204 C 140 196, 240 92, 400 52" />
+      <rect class="nd-hot" x="398" y="50" width="4" height="4" />
+      <text x="416" y="44" text-anchor="end" class="t-major">88.36M ops/s</text>
+      <text x="416" y="186" text-anchor="end" class="t-muted">coarse lock</text>
+      <path class="s-muted" vector-effect="non-scaling-stroke" d="M432 52 v144 M429 52 h6 M429 196 h6" />
+      <text x="440" y="128" class="t-major">13×</text>
+      <text x="36" y="16" class="t-muted">ops/s</text>
+      <text x="240" y="244" text-anchor="middle" class="t-muted">threads</text>
+    </svg>
+  )
+}
+
+{
+  slug === 'mllm-energy' && (
+    <svg
+      class="fig fig-sm"
+      viewBox="0 0 320 200"
+      role="img"
+      aria-label="Request timeline for InternVL3-8B on an NVIDIA A100: decode occupies 88.7 percent of request time while SM utilization stays near 14 percent."
+    >
+      <defs>
+        <pattern id={`hatch-${slug}`} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--amber)" stroke-width="1.5" />
+        </pattern>
+      </defs>
+      <rect x="24" y="40" width="31" height="20" fill={`url(#hatch-${slug})`} />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 40 h272 v20 h-272 Z" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M55 40 v20" />
+      <path class="s-muted" vector-effect="non-scaling-stroke" d="M40 40 v-12" />
+      <text x="24" y="24">prefill</text>
+      <text x="120" y="24">decode: 88.7% of time</text>
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 96 v76 h272" />
+      <path class="s-muted dashed" vector-effect="non-scaling-stroke" d="M24 100 h272" />
+      <text x="296" y="94" text-anchor="end" class="t-muted">100%</text>
+      <path class="s-hot" vector-effect="non-scaling-stroke" d="M24 106 h24 v56 h248" />
+      <rect class="nd-hot" x="46" y="160" width="4" height="4" />
+      <path class="s-muted" vector-effect="non-scaling-stroke" d="M180 162 v-14" />
+      <text x="150" y="142">14% sm util</text>
+    </svg>
+  )
+}
+
+{
+  slug === 'pintos' && (
+    <svg
+      class="fig fig-sm"
+      viewBox="0 0 320 184"
+      role="img"
+      aria-label="Pintos kernel layer stack: user processes above the user/kernel boundary, then system calls, virtual memory, and file system below it."
+    >
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 24 h160 v30 h-160 Z" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 62 h160 v30 h-160 Z" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 100 h160 v30 h-160 Z" />
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 138 h160 v30 h-160 Z" />
+      <text x="112" y="43" text-anchor="middle">user processes</text>
+      <text x="112" y="81" text-anchor="middle">system calls</text>
+      <text x="112" y="119" text-anchor="middle">virtual memory</text>
+      <text x="112" y="157" text-anchor="middle">file system</text>
+      <path class="s-hot" vector-effect="non-scaling-stroke" d="M20 58 h184 M20 55 v6 M204 55 v6" />
+      <rect class="nd-hot" x="110" y="56" width="4" height="4" />
+      <text x="212" y="54">user/kernel</text>
+      <text x="212" y="68">boundary</text>
+    </svg>
+  )
+}
+
+</figure>
+
+<style>
+  .fig-frame {
+    margin: 0;
+  }
+
+  .fig {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .fig text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    fill: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The 320-wide figures upscale ~1.5× more than the 480-wide one, so
+     their labels would render half again as large. Only text scales —
+     every stroke is non-scaling — so this is the whole fix. */
+  .fig-sm text { font-size: 9.5px; }
+
+  .t-muted { fill: var(--ink-3); }
+  .t-major { fill: var(--amber); font-weight: 700; }
+
+  .s-muted,
+  .s-struct,
+  .s-hot,
+  .s-pen {
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .s-muted { stroke: var(--ink-3); }
+  .s-struct { stroke: var(--ink-2); }
+  .s-hot { stroke: var(--hot); stroke-width: 2; filter: drop-shadow(0 0 4px var(--glow-hot)); }
+  .s-pen { stroke: var(--amber); }
+  .dashed { stroke-dasharray: 4 4; }
+
+  .nd { fill: var(--ink-2); }
+  .nd-hot { fill: var(--hot); }
+
+  /* Phone: the cards narrow, so bump the labels in user units to cancel
+     the downscale. */
+  @media (max-width: 700px) {
+    .fig text { font-size: 16px; }
+    .fig-sm text { font-size: 12px; }
+  }
+</style>

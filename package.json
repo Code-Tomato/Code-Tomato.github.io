@@ -7,11 +7,12 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "generate:og": "node scripts/generate-og.mjs"
+    "generate:og": "node scripts/generate-og.mjs",
+    "generate:favicon": "node scripts/generate-favicon.mjs"
   },
   "dependencies": {
     "@fontsource-variable/reddit-sans": "^5.2.7",
-    "@fontsource/reddit-mono": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "astro": "^7.1.0"
   },
   "devDependencies": {

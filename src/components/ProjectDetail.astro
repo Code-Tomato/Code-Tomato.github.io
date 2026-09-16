@@ -1,9 +1,11 @@
 ---
 /**
- * Project detail as a poster spec sheet: heavy head, numbered sections,
- * square geometry. Content comes verbatim from projects.ts.
+ * Project detail, built from the same parts as every other page: a page-head
+ * with its eyebrow, then numbered .section-tight blocks. Content comes
+ * verbatim from projects.ts.
  */
-import { getProjectBySlug, type Project } from '../data/projects';
+import ProjectFigure, { FIGURE_SLUGS } from './ProjectFigure.astro';
+import { type Project } from '../data/projects';
 
 interface Props {
   project: Project;
@@ -11,209 +13,143 @@ interface Props {
 
 const { project } = Astro.props;
 
-const isArchived = project.tier === 'archived';
-const year = project.date.slice(0, 4);
+const hasFigure = FIGURE_SLUGS.includes(project.slug);
 
-const links = [
-  { label: 'GitHub ↗', href: project.links.github },
+const textLinks = [
   { label: 'Write-up ↗', href: project.links.documentation },
   { label: 'Paper ↗', href: project.links.paper },
-  { label: 'Demo ↗', href: project.links.demo },
 ].filter((link): link is { label: string; href: string } => Boolean(link.href));
 
-const meta = [
-  project.dateDisplay,
-  project.status,
-  ...(project.teamProject ? ['Team project'] : []),
-  project.category[0],
-].filter(Boolean);
+const hasLinks = Boolean(project.links.github) || textLinks.length > 0;
 
-const seeAlso = project.seeAlso
-  .map((slug) => getProjectBySlug(slug))
-  .filter((p): p is Project => Boolean(p));
+// the date sits beside the title now, so this is what is left
+const meta = [...(project.teamProject ? ['Team project'] : []), project.category[0]].filter(Boolean);
 
-let sectionIndex = 0;
-const nn = () => String(++sectionIndex).padStart(2, '0');
-const secOverview = nn();
-const secImpact = project.impact ? nn() : null;
-const secStack = nn();
-const secLinks = links.length > 0 ? nn() : null;
-const secRelated = seeAlso.length > 0 ? nn() : null;
 ---
 
-<article class:list={['detail', { 'is-archived': isArchived }]}>
+<!-- Page head -->
+<section class="page-head">
   <div class="container">
-    <a href="/projects" class="label back-link">← All work</a>
-
-    <header class="detail-head">
-      {isArchived && <p class="label archive-stamp">Archive · {year}</p>}
-      <h1>{project.title}</h1>
-      <p class="detail-result">{project.headline}</p>
-      <p class="label detail-meta">{meta.join(' · ')}</p>
-    </header>
-
-    <section class="detail-sec" aria-labelledby="sec-overview">
-      <div class="sec-head">
-        <span class="sec-index">{secOverview}</span>
-        <span class="sec-label" id="sec-overview">Overview</span>
-      </div>
-      <div class="prose detail-prose">
-        <p class="detail-lede">{project.longDescription}</p>
-        <ul>
-          {project.keyFeatures.map((feature) => <li>{feature}</li>)}
-        </ul>
-      </div>
-    </section>
-
-    {
-      project.impact && (
-        <section class="detail-sec" aria-labelledby="sec-impact">
-          <div class="sec-head">
-            <span class="sec-index">{secImpact}</span>
-            <span class="sec-label" id="sec-impact">Impact</span>
-          </div>
-          <div class="frame impact-frame">
-            <p>{project.impact}</p>
-          </div>
-        </section>
-      )
-    }
-
-    <section class="detail-sec" aria-labelledby="sec-stack">
-      <div class="sec-head">
-        <span class="sec-index">{secStack}</span>
-        <span class="sec-label" id="sec-stack">Stack &amp; topics</span>
-      </div>
-      <ul class="tag-row" aria-label="Topics and stack">
-        {project.tags.map((tag) => <li class="label tag">{tag}</li>)}
-      </ul>
-    </section>
-
-    {
-      links.length > 0 && (
-        <section class="detail-sec" aria-labelledby="sec-links">
-          <div class="sec-head">
-            <span class="sec-index">{secLinks}</span>
-            <span class="sec-label" id="sec-links">Links</span>
-          </div>
-          <nav class="links-row" aria-label="Project links">
-            {links.map((link) => (
-              <a class="btn btn-secondary" href={link.href} target="_blank" rel="noopener noreferrer">
+    <div class="sec-head">
+      <a class="sec-label back-link" href="/projects">← All projects</a>
+      {
+        hasLinks && (
+          <span class="sec-aside link-set">
+            <span class="link-set-label">Links:</span>
+            {project.links.github && (
+              <a
+                class="gh-link"
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${project.title} on GitHub`}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>
+              </a>
+            )}
+            {textLinks.map((link) => (
+              <a class="link-dir" href={link.href} target="_blank" rel="noopener noreferrer">
                 {link.label}
               </a>
             ))}
-          </nav>
-        </section>
-      )
-    }
+          </span>
+        )
+      }
+    </div>
+    <div class="title-row">
+      <h1 class="display">{project.title}</h1>
+      <p class="label detail-date">
+        <time datetime={project.date}>{project.dateDisplay}</time>
+      </p>
+    </div>
+    <p class="label detail-meta">{meta.join(' · ')}</p>
 
-    {
-      seeAlso.length > 0 && (
-        <section class="detail-sec" aria-labelledby="sec-related">
-          <div class="sec-head">
-            <span class="sec-index">{secRelated}</span>
-            <span class="sec-label" id="sec-related">Related</span>
-          </div>
-          <ul class="related-row">
-            {seeAlso.map((p) => (
-              <li><a class="link-dir" href={`/projects/${p.slug}`}>{p.title} →</a></li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
+    <div class:list={['head-grid', { 'has-figure': hasFigure }]}>
+      <p class="lede page-lede" set:html={project.description} />
+      {hasFigure && <ProjectFigure slug={project.slug} />}
+    </div>
+
+    <div class="tag-block">
+      <div class="sec-head">
+        <span class="sec-label" id="sec-skills">Skills</span>
+      </div>
+      <ul class="tag-row" aria-labelledby="sec-skills">
+        {project.tags.map((tag) => <li class="label tag">{tag}</li>)}
+      </ul>
+    </div>
   </div>
-</article>
+</section>
 
 <style>
-  .detail {
-    /* Opaque slab like .section — otherwise the fixed gradient shows
-       through under dark ink and the page is unreadable. */
-    position: relative;
-    background: var(--paper);
-    box-shadow: 0 -26px 54px -26px var(--slab-sh), 0 26px 54px -26px var(--slab-sh);
-    padding-block: clamp(2.5rem, 1.5rem + 3vw, 4rem) var(--section-pad);
-  }
-
-  .back-link {
-    display: inline-block;
-    color: var(--ink-2);
-    text-decoration: none;
-    padding-block: 0.55rem;
-  }
-
-  .back-link:hover {
-    color: var(--accent);
-  }
-
-  /* ---- head ---- */
-  .detail-head {
-    margin-top: var(--space-6);
-    padding-top: var(--space-4);
-    border-top: 4px solid var(--line);
-  }
-
-  .archive-stamp {
+  .detail-date {
     color: var(--ink-3);
-    margin-bottom: var(--space-3);
+    white-space: nowrap;
   }
 
-  .detail-result {
-    margin-top: var(--space-6);
-    font-size: var(--text-lede);
-    font-weight: 700;
-    line-height: 1.35;
-    color: var(--ink);
-    max-width: 44ch;
-    text-wrap: balance;
+  /* sits in the aside slot, so .sec-head's margin-left:auto still right-aligns it */
+  .link-set {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .link-set-label { color: var(--ink-3); }
+
+  .gh-link {
+    display: inline-flex;
+    color: var(--ink-3);
+  }
+
+  .gh-link svg {
+    width: 1.35em;
+    height: 1.35em;
+  }
+
+  .gh-link:hover { color: var(--amber); }
+
+  /* inherits .sec-label's mono caps; only the link bits differ */
+  .back-link { text-decoration: none; }
+  .back-link:hover { color: var(--hot); }
+
+  /* Title left, date hard right on the same baseline; both span the full
+     width above the partition. */
+  .title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
   }
 
   .detail-meta {
-    margin-top: var(--space-4);
+    margin-top: var(--space-2);
     color: var(--ink-3);
   }
 
-  /* ---- sections ---- */
-  .detail-sec {
-    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4rem);
+  .head-grid {
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-3);
   }
 
-  .detail-sec .sec-head {
-    margin-bottom: var(--space-6);
-    border-top-width: 2px;
+  /* .page-lede carries its own top margin for pages where it follows an h1;
+     here the grid already sets the gap. */
+  .head-grid .page-lede { margin-top: 0; }
+
+
+  /* Even split: the figure gets as much room as the title block. */
+  @media (min-width: 720px) {
+    .head-grid.has-figure {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: var(--space-8);
+    }
   }
 
-  .detail-lede {
-    font-size: var(--text-lede);
-    font-weight: 500;
-    line-height: 1.45;
-    color: var(--ink-2);
-  }
+  /* its own full-width band under the partition; the sec-head rule does the
+     separating, so it needs far less air above it than a bare row did */
+  .tag-block { margin-top: var(--space-6); }
 
-  .detail-prose ul {
-    margin-top: var(--space-6);
-  }
-
-  .detail-prose li + li {
-    margin-top: var(--space-2);
-  }
-
-  /* Archived projects stay quiet: markers drop the accent. */
-  .is-archived .detail-prose :global(li)::before {
-    background: var(--ink-3);
-  }
-
-  .impact-frame {
-    padding: var(--space-6);
-    max-width: var(--measure);
-    border-left: 8px solid var(--accent);
-  }
-
-  .is-archived .impact-frame {
-    border-left-color: var(--line);
-  }
-
-  /* ---- tags ---- */
   .tag-row {
     list-style: none;
     display: flex;
@@ -221,29 +157,11 @@ const secRelated = seeAlso.length > 0 ? nn() : null;
     gap: var(--space-2);
   }
 
+  /* 1px, like the header tabs; this was the last 2px border on the site. */
   .tag {
-    color: var(--ink);
-    border: 2px solid var(--line);
-    padding: 0.35rem 0.6rem;
-    white-space: nowrap;
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+    padding: calc(var(--grid) * 0.25 - 1px) calc(var(--grid) * 0.5);
   }
 
-  /* ---- links ---- */
-  .links-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-  }
-
-  .related-row {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-8);
-  }
-
-  .related-row a {
-    display: inline-block;
-    padding-block: 0.55rem;
-  }
 </style>

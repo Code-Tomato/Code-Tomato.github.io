@@ -1,690 +1,245 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getProjectBySlug, type Project } from '../data/projects';
-import { publication } from '../data/experience';
-
-function must(slug: string): Project {
-  const p = getProjectBySlug(slug);
-  if (!p) throw new Error(`Missing project in data layer: ${slug}`);
-  return p;
-}
-
-const baselines = must('serving-baselines');
-const chtRadix = must('cht-radix');
-const mllm = must('mllm-energy');
-const pintos = must('pintos');
-
-const work = [
-  { index: '01', project: baselines },
-  { index: '02', project: chtRadix },
-  { index: '03', project: mllm },
-  { index: '04', project: pintos },
-];
 ---
 
 <BaseLayout
   title="Home"
-  description="Nathan Lemma — systems for machine learning, built from the metal up. ECE at UT Austin, SOSP '26 contributor, systems software at Caterpillar."
+  description="Nathan Lemma: systems for machine learning. ECE at UT Austin, SOSP '26 contributor, systems software at Caterpillar."
 >
-  <!-- ============ HERO: window to the gradient ============ -->
-  <section class="hero section-window">
-    <div class="container">
-      <p class="label hero-kicker">Nathan Lemma — ECE, UT Austin</p>
-      <h1 class="display hero-title">
-        Systems for machine learning, built from the metal&nbsp;up.
-      </h1>
-      <div class="hero-foot">
-        <p class="hero-lede">
-          I work on GPU inference serving, making it faster and more energy-efficient. Before that I
-          worked on firmware, kernels, and concurrent data structures.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-on-accent" href="/projects">Explore the work</a>
-          <a class="link-dir hero-alt" href="/projects/serving-baselines">How I test serving systems ↗</a>
+  <!-- ============ HERO — the instrument panel ============ -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="sec-head">
+        <span class="sec-label">Home</span>
+        <span class="sec-aside">Austin, TX · ECE '27</span>
+      </div>
+
+      <div class="hero-split">
+        <div class="panel-copy">
+          <h1 class="display hero-title">Nathan Lemma</h1>
+          <p class="hero-role">
+            ECE at UT Austin. GPU inference serving in the systems-for-ML group; firmware and data
+            infrastructure at Caterpillar.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-sweep" href="/projects">Projects</a>
+            <a class="hero-alt" href="/projects/serving-baselines">Most recent project →</a>
+          </div>
         </div>
+
+        <!-- the nav's tomato, tipped over, filling the space beside the name -->
+        <svg class="hero-mark" viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="10" y="16" width="28" height="24" rx="2" fill="var(--hot)" />
+          <path class="stem" d="M20 16 Q24 8 28 16" stroke="var(--stem)" stroke-width="2.4" fill="none" stroke-linecap="round" />
+          <path class="stem" d="M17 14 Q24 6 31 14" stroke="var(--stem)" stroke-width="2" fill="none" stroke-linecap="round" />
+        </svg>
       </div>
     </div>
   </section>
 
-  <!-- ============ 01 / PUBLICATION ============ -->
-  <section id="publication" class="section" aria-labelledby="pub-heading">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-index">01</span>
-        <span class="sec-label" id="pub-heading">Publication</span>
-        <span class="sec-aside">peer review in progress</span>
-      </div>
+  <!-- ============ DIRECTORY ============ -->
+  <nav class="directory" aria-label="Sections">
+    <a class="dir-row bracketed" href="/projects">
+      <span class="dir-no">01</span>
+      <span class="dir-name">Projects</span>
+      <span class="dir-desc">GPU serving baselines, concurrent data structures and an OS kernel</span>
+      <span class="dir-go" aria-hidden="true">→</span>
+    </a>
+    <a class="dir-row bracketed" href="/experience">
+      <span class="dir-no">02</span>
+      <span class="dir-name">Experience</span>
+      <span class="dir-desc">Research at UT Austin, three teams at Caterpillar, Formula SAE before that</span>
+      <span class="dir-go" aria-hidden="true">→</span>
+    </a>
+    <a class="dir-row bracketed" href="/about">
+      <span class="dir-no">03</span>
+      <span class="dir-name">About</span>
+      <span class="dir-desc">Education, skills, scholarships, and what I do away from the screen</span>
+      <span class="dir-go" aria-hidden="true">→</span>
+    </a>
+    <a class="dir-row bracketed" href="/contact">
+      <span class="dir-no">04</span>
+      <span class="dir-name">Contact</span>
+      <span class="dir-desc">Hiring, research, or fun: replies within 24h</span>
+      <span class="dir-go" aria-hidden="true">→</span>
+    </a>
+  </nav>
 
-      <div class="pub-grid">
-        <p class="pub-venue" aria-label={`${publication.venue}, ${publication.note}`}>
-          <span class="pub-venue-name">{publication.venue}</span>
-          <span class="label pub-note">{publication.note}</span>
-        </p>
-        <div class="pub-body">
-          <p class="pub-line">{publication.line}</p>
-          <p class="pub-more"><a class="link-dir" href="/projects/serving-baselines">The baselines I built ↗</a></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 02 / SELECTED WORK ============ -->
-  <section class="section section-gray" aria-labelledby="work-heading">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-index">02</span>
-        <span class="sec-label" id="work-heading">Selected work</span>
-        <span class="sec-aside">write-ups · repos · results</span>
-      </div>
-
-      <div class="work-list">
-        {
-          work.map(({ index, project }) => (
-            <article class="work-item">
-              <p class="num work-num" aria-hidden="true">{index}</p>
-              <div class="work-body">
-                <h2 class="work-title">
-                  <a class="link-quiet" href={`/projects/${project.slug}`}>{project.title}</a>
-                </h2>
-                <p class="work-result">{project.headline}</p>
-                <p class="work-desc">{project.description}</p>
-                <ul class="work-links">
-                  {project.links.github && (
-                    <li><a class="link-dir" href={project.links.github}>Repo ↗</a></li>
-                  )}
-                  {project.links.documentation && (
-                    <li><a class="link-dir" href={project.links.documentation}>Write-up ↗</a></li>
-                  )}
-                  {project.links.paper && (
-                    <li><a class="link-dir" href={project.links.paper}>Paper ↗</a></li>
-                  )}
-                  <li><a class="link-dir" href={`/projects/${project.slug}`}>Details →</a></li>
-                </ul>
-              </div>
-              <div class="work-fig">
-                {project.slug === 'serving-baselines' && (
-                  <div class="frame fig-frame">
-                    <svg
-                      class="fig"
-                      viewBox="0 0 320 210"
-                      role="img"
-                      aria-label="Pipeline schematic: the GPUlets and USHER papers flow through reimplementation code modules into a check-marked validation stage."
-                    >
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M20 20 h44 l12 12 v40 h-56 Z" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M64 20 v12 h12" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M20 112 h44 l12 12 v40 h-56 Z" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M64 112 v12 h12" />
-                      <text x="16" y="88">gpulets paper</text>
-                      <text x="16" y="180">usher paper</text>
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M124 28 h72 v36 h-72 Z" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M132 38 h32 M132 46 h44 M132 54 h24" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M124 120 h72 v36 h-72 Z" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M132 130 h32 M132 138 h44 M132 146 h24" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M76 138 h48" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M196 138 h18 v-46 h18" />
-                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M76 46 h48 M196 46 h18 v46 h18 M296 92 h12" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M232 70 h64 v44 h-64 Z" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M250 92 l8 8 l18 -20" />
-                      <text x="264" y="132" text-anchor="middle" class="t-muted">validated</text>
-                      <rect class="nd" x="122" y="44" width="4" height="4" />
-                      <rect class="nd" x="122" y="136" width="4" height="4" />
-                      <rect class="nd" x="230" y="90" width="4" height="4" />
-                      <rect class="nd-hot" x="306" y="90" width="4" height="4" />
-                    </svg>
-                  </div>
-                )}
-                {project.slug === 'cht-radix' && (
-                  <div class="frame fig-frame">
-                    <svg
-                      class="fig"
-                      viewBox="0 0 480 260"
-                      role="img"
-                      aria-label="Throughput plot: the fine-grained curve climbs to 88.36 million operations per second, 13 times above the dashed coarse-locked baseline."
-                    >
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M36 28 v192 h420" />
-                      <path class="s-teal dashed" vector-effect="non-scaling-stroke" d="M36 208 C 140 206, 240 200, 400 196" />
-                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M36 204 C 140 196, 240 92, 400 52" />
-                      <rect class="nd-hot" x="398" y="50" width="4" height="4" />
-                      <text x="416" y="44" text-anchor="end" class="t-major">88.36M ops/s</text>
-                      <text x="416" y="186" text-anchor="end" class="t-muted">coarse lock</text>
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M432 52 v144 M429 52 h6 M429 196 h6" />
-                      <text x="440" y="128" class="t-major">13×</text>
-                      <text x="36" y="16" class="t-muted">ops/s</text>
-                      <text x="240" y="244" text-anchor="middle" class="t-muted">threads</text>
-                    </svg>
-                  </div>
-                )}
-                {project.slug === 'mllm-energy' && (
-                  <div class="frame fig-frame">
-                    <svg
-                      class="fig"
-                      viewBox="0 0 320 200"
-                      role="img"
-                      aria-label="Request timeline for InternVL3-8B on an NVIDIA A100: decode occupies 88.7 percent of request time while SM utilization stays near 14 percent."
-                    >
-                      <defs>
-                        <pattern id="hatch05" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--accent-grid)" stroke-width="1.5" />
-                        </pattern>
-                      </defs>
-                      <rect x="24" y="40" width="31" height="20" fill="url(#hatch05)" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 40 h272 v20 h-272 Z" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M55 40 v20" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M40 40 v-12" />
-                      <text x="24" y="24">prefill</text>
-                      <text x="120" y="24">decode — 88.7% of time</text>
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 96 v76 h272" />
-                      <path class="s-muted dashed" vector-effect="non-scaling-stroke" d="M24 100 h272" />
-                      <text x="296" y="94" text-anchor="end" class="t-muted">100%</text>
-                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M24 106 h24 v56 h248" />
-                      <rect class="nd-hot" x="46" y="160" width="4" height="4" />
-                      <path class="s-muted" vector-effect="non-scaling-stroke" d="M180 162 v-14" />
-                      <text x="150" y="142">14% sm util</text>
-                    </svg>
-                  </div>
-                )}
-                {project.slug === 'pintos' && (
-                  <div class="frame fig-frame">
-                    <svg
-                      class="fig"
-                      viewBox="0 0 320 184"
-                      role="img"
-                      aria-label="Pintos kernel layer stack: user processes above the user/kernel boundary, then system calls, virtual memory, and file system below it."
-                    >
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 24 h160 v30 h-160 Z" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 62 h160 v30 h-160 Z" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 100 h160 v30 h-160 Z" />
-                      <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 138 h160 v30 h-160 Z" />
-                      <text x="112" y="43" text-anchor="middle">user processes</text>
-                      <text x="112" y="81" text-anchor="middle">system calls</text>
-                      <text x="112" y="119" text-anchor="middle">virtual memory</text>
-                      <text x="112" y="157" text-anchor="middle">file system</text>
-                      <path class="s-hot" vector-effect="non-scaling-stroke" d="M20 58 h184 M20 55 v6 M204 55 v6" />
-                      <rect class="nd-hot" x="110" y="56" width="4" height="4" />
-                      <text x="212" y="54">user/kernel</text>
-                      <text x="212" y="68">boundary</text>
-                    </svg>
-                  </div>
-                )}
-                <p class="label fig-date"><time datetime={project.date}>{project.dateDisplay}</time></p>
-              </div>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 03 / EXPERIENCE ============ -->
-  <section class="section" aria-labelledby="traj-heading">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-index">03</span>
-        <span class="sec-label" id="traj-heading">Experience</span>
-        <span class="sec-aside">2023 → 2026</span>
-      </div>
-
-      <p class="sec-intro">
-        At Caterpillar I've worked across three teams. At UT Austin my research went from a
-        RISC-V simulator to multi-GPU serving baselines for systems-for-ML work.
-      </p>
-
-      <ol class="traj">
-        <li class="stop">
-          <p class="stop-year" aria-hidden="true">2023</p>
-          <div class="stop-body">
-            <h3 class="stop-title">Hardware</h3>
-            <p class="stop-desc">
-              Longhorn Racing FSAE Electric — led battery-management system design; state-of-charge
-              algorithm within 5% range error.
-            </p>
-          </div>
-        </li>
-        <li class="stop">
-          <p class="stop-year" aria-hidden="true">2024</p>
-          <div class="stop-body">
-            <h3 class="stop-title">Embedded</h3>
-            <p class="stop-desc">
-              Firmware at Caterpillar; instruction-accurate RISC-V simulation in UT's FAST group.
-            </p>
-            <ul class="stubs">
-              <li>
-                <span class="stub-text">Platform software — HAL &amp; API layers, now in production</span>
-                <span class="label stub-date">2024–25</span>
-              </li>
-              <li>
-                <span class="stub-text">System diagnostics — HIL tests across 30 I/O types</span>
-                <span class="label stub-date">2025–26</span>
-              </li>
-              <li>
-                <span class="stub-text">Data &amp; analytics — .NET + AWS Lambda usage metering</span>
-                <span class="label stub-date">2026–</span>
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li class="stop">
-          <p class="stop-year" aria-hidden="true">2025</p>
-          <div class="stop-body">
-            <h3 class="stop-title">OS &amp; concurrency</h3>
-            <p class="stop-desc">
-              Built out Pintos from the bare kernel; benchmarked concurrent hash tables and radix
-              trees under real LLM traces.
-            </p>
-          </div>
-        </li>
-        <li class="stop">
-          <p class="stop-year" aria-hidden="true">2026</p>
-          <div class="stop-body">
-            <h3 class="stop-title">Systems for ML</h3>
-            <p class="stop-desc">
-              Built the multi-GPU serving baselines for a SOSP '26 paper on energy-efficient
-              inference serving.
-            </p>
-          </div>
-        </li>
-      </ol>
-
-      <p class="traj-more"><a class="link-dir" href="/about">More about the path →</a></p>
-    </div>
-  </section>
-
-  <!-- ============ 04 / CONTACT ============ -->
-  <section id="contact" class="section section-gray" aria-labelledby="contact-heading">
-    <div class="container">
-      <div class="sec-head">
-        <span class="sec-index">04</span>
-        <span class="sec-label" id="contact-heading">Contact</span>
-        <span class="sec-aside">replies within 48h</span>
-      </div>
-
-      <p class="sec-intro">
-        If you're hiring, considering me for a research role, or want to talk about GPU
-        scheduling, get in touch.
-      </p>
-
-      <a class="btn btn-primary" href="/contact">Get in touch →</a>
-    </div>
-  </section>
 </BaseLayout>
 
 <style>
-  /* ---- hero: window to the gradient ---- */
+
+  /* ---- hero ---- */
   .hero {
-    padding-block: clamp(2.5rem, 1rem + 4vw, 5rem) clamp(3.5rem, 2rem + 6vw, 8rem);
+    position: relative;
+    padding-block: var(--grid) calc(var(--grid) * 1.5);
   }
 
-  .hero-kicker {
-    color: color-mix(in oklch, var(--plate-ink) 80%, var(--plate-bg));
-    margin-bottom: var(--space-6);
-  }
+  .hero-grid { position: relative; }
 
-  .hero-title {
-    max-width: 16ch;
-  }
+  /* Below the breakpoint the copy has the row to itself and the mark is the
+     first thing that should go: the header already carries one. */
+  .hero-mark { display: none; }
 
-  .hero-foot {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-8);
-    align-items: end;
-    margin-top: clamp(2.5rem, 1.5rem + 4vw, 5rem);
-  }
+  @media (min-width: 720px) {
+    /* 60 words, 40 tomato */
+    .hero-split {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      align-items: center;
+      gap: var(--space-8);
+    }
 
-  @media (min-width: 900px) {
-    .hero-foot {
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: var(--space-16);
+    .hero-mark {
+      display: block;
+      justify-self: center;
+      align-self: start;
+      margin-top: calc(var(--grid) * -1.95);
+      width: min(100%, 19rem);
+      height: auto;
+      rotate: 35deg;
+      filter: drop-shadow(0 0 16px var(--glow-hot));
+    }
+
+    .hero-mark .stem {
+      filter: drop-shadow(0 0 6px color-mix(in oklch, var(--stem) 80%, transparent));
     }
   }
 
-  .hero-lede {
+  .hero-title {
+    /* sized to the panel column, not the page — it wants three lines here */
+    font-size: clamp(1.9rem, 1rem + 2.4vw, 2.7rem);
+    line-height: 1.16;
+    max-width: 24ch;
+    color: var(--ink);
+  }
+
+  /* On this page the header sits on the instrument, so the whole top of the
+     page is one dark block instead of a light bar butted against a dark one.
+     Scoped to index — these rules ship only with this page. */
+
+  .hero-role {
     font-size: var(--text-lede);
     font-weight: 500;
-    line-height: 1.4;
-    max-width: 44ch;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 48ch;
+    margin-top: var(--space-4);
   }
 
   .hero-actions {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--space-6);
+    margin-top: var(--space-6);
   }
+
+  .btn-sweep {
+    background: var(--sweep);
+    color: var(--on-accent);
+    box-shadow: 0 6px 18px -8px var(--hot);
+  }
+  .btn-sweep:hover { color: var(--on-accent); box-shadow: 0 10px 24px -8px var(--hot); }
 
   .hero-alt {
-    color: var(--plate-ink);
-    border-bottom-color: var(--plate-ink);
-  }
-
-  .hero-alt:hover {
-    color: var(--plate-ink);
-    border-bottom-color: transparent;
-  }
-
-  /* ---- 01 / publication ---- */
-  .pub-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-8);
-    align-items: start;
-  }
-
-  @media (min-width: 900px) {
-    .pub-grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      gap: var(--space-16);
-    }
-  }
-
-  .pub-venue {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-4);
-    max-width: none;
-  }
-
-  .pub-venue-name {
-    font-size: var(--text-num);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    color: var(--ink);
-    white-space: nowrap;
-  }
-
-  .pub-note {
-    color: var(--accent);
-    border: 2px solid var(--accent);
-    padding: 0.3rem 0.55rem;
-    white-space: nowrap;
-  }
-
-  .pub-line {
-    color: var(--ink-2);
-  }
-
-  .pub-more {
-    margin-top: var(--space-6);
-  }
-
-  /* ---- 02 / selected work ---- */
-  .work-list {
-    display: grid;
-  }
-
-  .work-item {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
-    padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
-    border-top: 1px solid var(--line-soft);
-  }
-
-  .work-item:first-child {
-    border-top: none;
-    padding-top: 0;
-  }
-
-  @media (min-width: 960px) {
-    .work-item {
-      grid-template-columns: minmax(4.5rem, 8rem) minmax(0, 6fr) minmax(0, 5fr);
-      gap: var(--space-8);
-    }
-  }
-
-  .work-num {
-    line-height: 0.9;
-  }
-
-  .work-title {
-    font-size: var(--text-h3);
-    font-weight: 800;
-    letter-spacing: -0.008em;
-    text-transform: uppercase;
-    line-height: 1.1;
-  }
-
-  .work-result {
-    margin-top: var(--space-3);
-    font-size: 1.185rem;
-    font-weight: 700;
-    line-height: 1.35;
-    color: var(--ink);
-    max-width: 40ch;
-    text-wrap: balance;
-  }
-
-  .work-desc {
-    margin-top: var(--space-3);
-    color: var(--ink-2);
-    max-width: 56ch;
-  }
-
-  .work-links {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-6);
-    margin-top: var(--space-6);
-  }
-
-  .work-links a {
-    display: inline-block;
-    padding-block: 0.55rem;
-    margin-block: -0.4rem;
-  }
-
-  .work-fig {
-    align-self: start;
-  }
-
-  .fig-frame {
-    padding: var(--space-4);
-  }
-
-  .fig-date {
-    margin-top: var(--space-2);
-    color: var(--ink-3);
-  }
-
-  /* Phones read text first; the figure follows as illustration. */
-  @media (max-width: 959.98px) {
-    .work-num {
-      font-size: 2rem;
-      line-height: 1;
-    }
-
-    .work-fig {
-      order: 3;
-    }
-  }
-
-  /* ---- figure language: two inks + the blue point ---- */
-  .fig text {
     font-family: var(--font-mono);
-    font-size: 13px;
-    letter-spacing: 0.01em;
-    fill: var(--ink-2);
-    font-variant-numeric: tabular-nums;
+    font-size: var(--text-small);
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklch, var(--amber) 40%, transparent);
+    padding-bottom: 0.15em;
   }
+  .hero-alt:hover { color: var(--amber); border-bottom-color: var(--amber); }
 
-  .fig .t-muted {
-    fill: var(--ink-3);
-  }
-
-  .fig .t-major {
-    fill: var(--ink);
-    font-weight: 700;
-  }
-
-  .s-muted,
-  .s-struct,
-  .s-hot,
-  .s-teal {
-    fill: none;
-    stroke-width: 1.5;
-  }
-
-  .s-muted { stroke: var(--ink-3); }
-  .s-struct { stroke: var(--ink); }
-  .s-hot { stroke: var(--accent); stroke-width: 2; }
-  .s-teal { stroke: var(--accent-grid); }
-
-  .dashed {
-    stroke-dasharray: 4 4;
-  }
-
-  .nd { fill: var(--ink); }
-  .nd-hot { fill: var(--accent); }
-
-  /* ---- 03 / experience ---- */
-  .sec-intro {
-    color: var(--ink-2);
-    margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
-  }
-
-  .traj {
-    list-style: none;
-    display: grid;
-  }
-
-  .stop {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-2) var(--space-8);
-    padding-block: var(--space-6);
-    border-top: 1px solid var(--line-soft);
-  }
-
-  @media (min-width: 720px) {
-    .stop {
-      grid-template-columns: minmax(4.5rem, 8rem) minmax(0, 1fr);
-    }
-  }
-
-  .stop-year {
-    font-family: var(--font-mono);
-    font-size: var(--text-label);
-    letter-spacing: 0.09em;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-    padding-top: 0.35rem;
-  }
-
-  .stop-title {
-    text-transform: uppercase;
-    letter-spacing: 0.01em;
-  }
-
-  .stop-desc {
-    margin-top: var(--space-2);
-    max-width: 60ch;
-  }
-
-  .stubs {
-    list-style: none;
-    margin-top: var(--space-4);
+  /* ---- the directory: three doorways, styled as rack rows ---- */
+  .directory {
+    position: relative;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
     display: grid;
     gap: var(--space-2);
-    border-left: 2px solid var(--line);
-    padding-left: var(--space-6);
+    padding-block: var(--space-4) var(--space-8);
   }
 
-  .stubs li {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-1) var(--space-4);
-  }
-
-  .stub-text {
-    font-size: var(--text-small);
-    color: var(--ink-2);
-  }
-
-  .stub-date {
-    color: var(--ink-3);
-    white-space: nowrap;
-  }
-
-  .traj-more {
-    margin-top: var(--space-8);
-  }
-
-  /* ---- 04 / contact ---- */
-  .pin-list {
-    list-style: none;
-    max-width: 46rem;
-    border-bottom: 2px solid var(--line);
-  }
-
-  .pin-row {
+  .dir-row {
+    /* the bracket pseudo-elements anchor here, not to the directory */
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr) auto;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
     align-items: baseline;
     gap: var(--space-4);
-    padding: var(--space-4) 0;
-    border-top: 2px solid var(--line);
+    padding: calc(var(--grid) * 0.75);
     text-decoration: none;
-    color: inherit;
+    background-color: var(--panel);
+    background-image: var(--grain);
+    background-size: 110px 110px;
+    background-blend-mode: overlay;
+    border: 1px solid var(--line);
+    transition: border-color 160ms var(--ease), background-color 160ms var(--ease), transform 160ms var(--ease);
   }
 
-  .pin-label {
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    color: var(--ink);
+  .dir-row:hover {
+    background-color: var(--panel-2);
+    border-color: color-mix(in oklch, var(--amber) 40%, var(--line));
+    transform: translateX(3px);
   }
 
-  .pin-value {
-    color: var(--ink-2);
-    overflow-wrap: anywhere;
-    text-transform: none;
-    letter-spacing: 0.02em;
-  }
-
-  .pin-arrow {
-    font-size: 1.35rem;
+  .dir-no {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
     font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--hot);
+  }
+
+  .dir-name {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--ink);
-    transition: color 100ms var(--ease), translate 100ms var(--ease);
   }
 
-  .pin-row:hover .pin-label,
-  .pin-row:hover .pin-arrow {
-    color: var(--accent);
-  }
+  .dir-desc { color: var(--ink-2); font-size: var(--text-small); }
 
-  .pin-row:hover .pin-arrow {
-    translate: 4px 0;
+  .dir-go {
+    font-family: var(--font-mono);
+    color: var(--ink-3);
+    transition: color 160ms var(--ease), transform 160ms var(--ease);
   }
+  .dir-row:hover .dir-go { color: var(--amber); }
+  .dir-row:hover .dir-name { color: var(--amber); }
 
-  @media (max-width: 480px) {
-    .pin-row {
-      grid-template-columns: minmax(0, 1fr) auto;
+  @media (max-width: 760px) {
+    /* Four children into three columns: pushing the description onto its own
+       row left the arrow to auto-place, and it landed in a third row under the
+       number. Every child gets an explicit cell instead. */
+    .dir-row {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      row-gap: var(--space-1);
+      align-items: center;
     }
 
-    .pin-value {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    .pin-arrow {
-      grid-row: 1 / span 2;
-      align-self: center;
-    }
-  }
-
-  .contact-form-wrap {
-    margin-top: var(--space-12);
-    max-width: 46rem;
+    .dir-no { grid-area: 1 / 1; }
+    .dir-name { grid-area: 1 / 2; }
+    .dir-go { grid-area: 1 / 3; }
+    .dir-desc { grid-area: 2 / 2 / 3 / -1; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .pin-row:hover .pin-arrow {
-      translate: none;
-    }
+    .dir-row:hover { transform: none; }
+  }
+
+
+    /* ---- Phone ---- */
+  @media (max-width: 640px) {
+    .hero { padding-block: var(--space-3) var(--space-6); }
+    .hero-role { margin-top: var(--space-3); }
+    .hero-actions { margin-top: var(--space-4); gap: var(--space-4); }
+    .btn { width: 100%; justify-content: center; }
   }
 </style>
+

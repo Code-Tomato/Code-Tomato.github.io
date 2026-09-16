@@ -23,5 +23,5 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# vscode setting folder
-.vscode/scripts/.fonts/
+# fonts downloaded by scripts/generate-og.mjs
+scripts/.fonts/

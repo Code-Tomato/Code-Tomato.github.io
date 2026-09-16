@@ -3,177 +3,354 @@ const currentPath = Astro.url.pathname;
 const isActive = (path: string) => currentPath === path || currentPath === `${path}/`;
 
 const links = [
-  { href: '/projects', label: 'Work' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/experience', label: 'Experience' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
 
-const sun = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>`;
-const moon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M20.5 13.3A8 8 0 1 1 10.7 3.5 6.3 6.3 0 0 0 20.5 13.3Z"/></svg>`;
 ---
 
-<header class="header">
-  <nav class="nav" aria-label="Main">
-    <a href="/" class="brand" aria-label="Nathan Lemma — home">
-      <svg class="mark" width="20" height="20" viewBox="0 0 16 16" aria-hidden="true">
-        <path class="mark-stem" d="M8 6 V3" fill="none" stroke-width="1.8" />
-        <path class="mark-stem" d="M8 3.4 L5.2 4.9 M8 3.4 L10.8 4.9" fill="none" stroke-width="1.6" stroke-linecap="square" />
-        <rect x="3.25" y="6" width="9.5" height="9.5" rx="1.6" fill="var(--accent)" />
+<header class="site-header">
+  <div class="container hd-row">
+    <a href="/" class="brand" aria-label="Nathan Lemma, home">
+      <svg class="mark" viewBox="0 0 48 48" aria-hidden="true">
+        <rect x="10" y="16" width="28" height="24" rx="2" fill="var(--hot)" />
+        <path class="stem" d="M20 16 Q24 8 28 16" stroke="var(--stem)" stroke-width="2.4" fill="none" stroke-linecap="round" />
+        <path class="stem" d="M17 14 Q24 6 31 14" stroke="var(--stem)" stroke-width="2" fill="none" stroke-linecap="round" />
       </svg>
       <span class="brand-name">Nathan Lemma</span>
     </a>
 
-    <div class="nav-right">
-      <ul class="nav-list">
-        {
-          links.map((link) => (
-            <li>
-              <a href={link.href} class="nav-link" aria-current={isActive(link.href) ? 'page' : undefined}>
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-      <button class="theme-toggle theme-desktop" type="button" aria-label="Toggle light and dark">
-        <span class="i-sun" set:html={sun} />
-        <span class="i-moon" set:html={moon} />
-      </button>
-    </div>
-
-    <button class="theme-toggle theme-mobile" type="button" aria-label="Toggle light and dark">
-      <span class="i-sun" set:html={sun} />
-      <span class="i-moon" set:html={moon} />
+    <button
+      class="menu-btn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      aria-label="Open menu"
+    >
+      <span class="menu-bar"></span>
+      <span class="menu-bar"></span>
+      <span class="menu-bar"></span>
     </button>
+
+    <nav class="tabs" aria-label="Main">
+      {
+        links.map((link) => (
+          <a href={link.href} class="tab" aria-current={isActive(link.href) ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+
+  <div class="menu-scrim" hidden></div>
+
+  <nav class="drawer" id="site-menu" aria-label="Menu" inert>
+    <button class="menu-close" type="button" aria-label="Close menu">
+      <span class="menu-bar"></span>
+      <span class="menu-bar"></span>
+    </button>
+    {
+      links.map((link) => (
+        <a href={link.href} class="drawer-link" aria-current={isActive(link.href) ? 'page' : undefined}>
+          {link.label}
+        </a>
+      ))
+    }
   </nav>
 </header>
 
 <style>
-  .header {
-    position: fixed;
-    inset: 0 0 auto 0;
-    z-index: var(--z-nav);
-    display: flex;
-    justify-content: center;
-    padding: 0.75rem 1.2rem;
-    pointer-events: none;
+  /* grid multiples, so the first line of the page below still lands on a rule */
+  .site-header {
+    border-bottom: 1px solid var(--line);
+    padding-block: var(--grid) calc(var(--grid) * 1.5 - 1px);
   }
 
-  .nav {
-    width: min(100%, var(--container));
+  .hd-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-  }
-
-  /* solid pills */
-  .brand,
-  .nav-right {
-    pointer-events: auto;
-    min-height: 3rem;
-    display: flex;
-    align-items: center;
-    border-radius: 999px;
-    background: var(--paper);
-    border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
-    box-shadow: var(--pill-sh);
+    gap: var(--space-4);
+    flex-wrap: wrap;
   }
 
   .brand {
-    gap: 0.5rem;
-    padding: 0.34rem 0.95rem 0.34rem 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     text-decoration: none;
     color: var(--ink);
   }
-  .mark { flex: none; align-self: center; transform: translateY(-2px); filter: drop-shadow(0 2px 3px color-mix(in oklch, var(--accent) 40%, transparent)); }
-  .mark-stem { stroke: var(--leaf); }
-  .brand-name { font-weight: 680; letter-spacing: -0.01em; font-size: 0.95rem; line-height: 1; color: var(--ink); }
 
-  .nav-right { gap: 0.25rem; padding: 0.3rem 0.35rem; }
-  .nav-list { display: flex; align-items: center; gap: 0.1rem; list-style: none; }
-  .nav-link {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 540;
-    color: var(--ink);
-    text-decoration: none;
-    padding: 0.5rem 0.9rem;
-    border-radius: 999px;
-    transition: color 160ms var(--ease), background 160ms var(--ease);
+  /* the tomato — 1.5 cells square. The whole mark glows red; the green stem
+     carries its own smaller green halo inside that. */
+  .mark {
+    width: calc(var(--grid) * 1.5);
+    height: calc(var(--grid) * 1.5);
+    flex: none;
+    filter: drop-shadow(0 0 8px var(--glow-hot));
   }
-  .nav-link:hover { color: var(--accent); }
-  .nav-link[aria-current='page'] { color: var(--accent); background: color-mix(in oklch, var(--accent) 12%, transparent); }
+  .stem { filter: drop-shadow(0 0 3px color-mix(in oklch, var(--stem) 80%, transparent)); }
 
-  .theme-toggle {
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 999px;
+  .brand-name {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: calc(var(--grid) * 0.6);
+    line-height: var(--grid);
+    color: var(--ink);
+  }
+
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  /* index-card tabs, each pinned at its own angle; 1.5 cells tall */
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: calc(var(--grid) * 0.5);
+    font-weight: 500;
+    line-height: var(--grid);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-2);
+    text-decoration: none;
     background: transparent;
-    border: none;
-    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: calc(var(--grid) * 0.25 - 1px) calc(var(--grid) * 0.5);
     cursor: pointer;
-    transition: background 160ms var(--ease), color 160ms var(--ease);
+    transition: color 140ms var(--ease), box-shadow 140ms var(--ease);
   }
-  .theme-toggle:hover { background: color-mix(in oklch, var(--accent) 14%, transparent); color: var(--accent); }
-  .theme-toggle .i-sun,
-  .theme-toggle .i-moon { display: grid; place-items: center; }
-  .theme-toggle .i-moon { display: none; }
-  :global([data-theme='dark']) .theme-toggle .i-sun { display: none; }
-  :global([data-theme='dark']) .theme-toggle .i-moon { display: grid; }
 
-  .theme-mobile { display: none; }
+  .tab:hover {
+    color: var(--amber);
+    border-color: color-mix(in oklch, var(--amber) 50%, transparent);
+  }
 
-  /* mobile: brand circle top-left · toggle circle top-right · links float at the bottom */
+  .tab[aria-current='page'] {
+    color: var(--amber);
+    border-color: color-mix(in oklch, var(--amber) 50%, transparent);
+    box-shadow: inset 0 -2px 0 var(--hot);
+  }
+
+
+  /* Phone: one compact bar. The tabs still wrap under the mark, but they stop
+     being finger-sized rack labels that eat the first screen. */
+  /* ---- the mobile menu ---- */
+  .menu-btn,
+  .menu-close {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: calc(var(--grid) * 1.5);
+    height: calc(var(--grid) * 1.5);
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--line);
+    cursor: pointer;
+  }
+
+  .menu-bar {
+    display: block;
+    width: 17px;
+    height: 1.5px;
+    margin-inline: auto;
+    background: var(--ink);
+  }
+
+  .menu-btn:hover,
+  .menu-close:hover { border-color: color-mix(in oklch, var(--amber) 50%, transparent); }
+  .menu-btn:hover .menu-bar,
+  .menu-close:hover .menu-bar { background: var(--amber); }
+
+  .menu-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: oklch(0 0 0 / 0.55);
+    opacity: 0;
+    transition: opacity 240ms var(--ease);
+  }
+
+  :global(html.menu-open) .menu-scrim { opacity: 1; }
+
+  .drawer {
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 55;
+    width: min(76vw, 290px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-3);
+    background-color: var(--panel);
+    background-image: var(--grain);
+    background-size: 110px 110px;
+    background-blend-mode: overlay;
+    border-left: 1px solid var(--line);
+    visibility: hidden;
+    translate: 100% 0;
+    /* visibility flips instantly on the way in so the close button is
+       focusable straight away, and is delayed on the way out so the panel
+       can finish sliding */
+    transition: translate 260ms var(--ease), visibility 0s linear 260ms;
+  }
+
+  :global(html.menu-open) .drawer {
+    visibility: visible;
+    translate: 0 0;
+    transition: translate 260ms var(--ease), visibility 0s;
+  }
+
+  /* The drawer is fixed to the viewport, but in flat the header sits below
+     the status bar. Without this the close button rides above the hamburger
+     it replaces. */
+  :global(html.flat) .drawer { padding-top: calc(var(--space-3) + var(--status-h)); }
+
+  .menu-close {
+    align-self: flex-end;
+    gap: 0;
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+  /* Absolutely positioned, so margin:auto can't centre them — pin to the
+     middle and pull back by half. translate and rotate are separate
+     properties, so both apply without one overwriting the other. */
+  .menu-close .menu-bar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    translate: -50% -50%;
+  }
+
+  .menu-close .menu-bar:first-child { rotate: 45deg; }
+  .menu-close .menu-bar:last-child { rotate: -45deg; }
+
+  .drawer-link {
+    font-family: var(--font-mono);
+    font-size: calc(var(--grid) * 0.6);
+    line-height: calc(var(--grid) * 1.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .drawer-link:last-child { border-bottom: none; }
+  .drawer-link:hover { color: var(--amber); }
+  .drawer-link[aria-current='page'] { color: var(--amber); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drawer, .menu-scrim { transition: none; }
+  }
+
+  /* Four tabs plus the wordmark need ~656px. Below that the row wrapped to two
+     lines before the drawer took over, so the drawer starts at 720 — clear of
+     the wrap point with room for font-loading and zoom differences. */
+  /* Above the drawer breakpoint the drawer and scrim don't exist at all.
+     Under the desktop warp filter the tube becomes their containing block,
+     and a drawer parked at translate(100%) would count as scrollable
+     overflow — a sideways scrollbar for a menu nobody can open. */
+  @media (min-width: 721px) {
+    .drawer,
+    .menu-scrim { display: none; }
+  }
+
   @media (max-width: 720px) {
-    .header { pointer-events: none; padding: 0.8rem 0.9rem; }
-    .nav { position: static; }
+    .site-header { padding-block: var(--space-3) var(--space-3); }
+    .tabs { display: none; }
+    .menu-btn,
+    .menu-close { display: flex; }
 
-    .brand {
-      pointer-events: auto;
-      position: fixed; top: 0.85rem; left: 0.95rem;
-      width: 48px; height: 48px; justify-content: center; gap: 0; padding: 0;
+    /* One line, always: the boxes around the tabs are what made the row wrap,
+       so on a phone they become plain labels instead of rack units. */
+    .hd-row { gap: var(--space-2); flex-wrap: nowrap; }
+    .mark { width: calc(var(--grid) * 1.15); height: calc(var(--grid) * 1.15); }
+    .brand-name { font-size: 0.88rem; white-space: nowrap; }
+
+    .tabs { gap: var(--space-3); flex-wrap: nowrap; }
+    .tab {
+      background: transparent;
+      border: none;
+      padding: 0.2rem 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
     }
+    .tab[aria-current='page'] { box-shadow: inset 0 -2px 0 var(--hot); }
+  }
+
+  /* Narrower than a 390 phone: the mark carries the identity on its own. */
+  @media (max-width: 520px) {
     .brand-name { display: none; }
-
-    .theme-desktop { display: none; }
-
-    .nav-right {
-      pointer-events: auto;
-      position: fixed; left: 0; right: 0; bottom: 1rem; top: auto;
-      margin-inline: auto; width: max-content;
-    }
-
-    .theme-mobile {
-      display: grid;
-      pointer-events: auto;
-      position: fixed; top: 0.85rem; right: 0.95rem;
-      width: 48px; height: 48px; border-radius: 999px;
-      background: var(--paper);
-      border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
-      box-shadow: var(--pill-sh);
-    }
   }
 </style>
 
 <script>
   const html = document.documentElement;
-  const toggles = document.querySelectorAll<HTMLButtonElement>('.theme-toggle');
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const drawer = document.querySelector<HTMLElement>('.drawer');
+  const scrim = document.querySelector<HTMLElement>('.menu-scrim');
+  const closeBtn = document.querySelector<HTMLButtonElement>('.menu-close');
 
-  const syncLabel = () => {
-    const dark = html.getAttribute('data-theme') === 'dark';
-    toggles.forEach((t) => t.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme'));
-  };
-  syncLabel();
+  if (toggle && drawer && scrim && closeBtn) {
+    // While the drawer is open the rest of the page is inert, so Tab can't
+    // walk into content sitting behind the scrim.
+    const background = () =>
+      [document.querySelector('.hd-row'), document.querySelector('main'), document.querySelector('.site-footer')]
+        .filter((el): el is HTMLElement => el instanceof HTMLElement);
 
-  toggles.forEach((t) =>
-    t.addEventListener('click', () => {
-      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      syncLabel();
-    })
-  );
+    const open = () => {
+      html.classList.add('menu-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      scrim.hidden = false;
+      // inert keeps the drawer out of the tab order and the a11y tree while shut
+      drawer.removeAttribute('inert');
+      background().forEach((el) => el.setAttribute('inert', ''));
+      closeBtn.focus();
+    };
+
+    const close = () => {
+      html.classList.remove('menu-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('inert', '');
+      // un-inert before focusing: the toggle lives inside the header row
+      background().forEach((el) => el.removeAttribute('inert'));
+      toggle.focus();
+      // keep the scrim around until it has faded
+      const done = () => { scrim.hidden = true; };
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+      else scrim.addEventListener('transitionend', done, { once: true });
+    };
+
+    toggle.addEventListener('click', () => {
+      html.classList.contains('menu-open') ? close() : open();
+    });
+    closeBtn.addEventListener('click', close);
+    scrim.addEventListener('click', close);
+    drawer.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) close();
+    });
+    addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && html.classList.contains('menu-open')) close();
+    });
+    // A resize past the breakpoint should not leave a drawer open behind the
+    // tabs. 721px is where the CSS actually swaps the drawer for the tab row
+    // (see the @media pair below); this used to say 641 and so closed the
+    // drawer while it was still the only nav on screen.
+    matchMedia('(min-width: 721px)').addEventListener('change', (e) => {
+      if (e.matches && html.classList.contains('menu-open')) close();
+    });
+  }
 </script>

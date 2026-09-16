@@ -1,27 +1,42 @@
 ---
 import '@fontsource-variable/reddit-sans/index.css';
-import '@fontsource/reddit-mono/latin-400.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/ibm-plex-mono/latin-700.css';
 import Header from '../components/Header.astro';
 import '../styles/global.css';
+// Preloaded so first paint uses the real faces. Without this the hero lede
+// paints in Arial, then reflows when Reddit Sans arrives.
+import redditSansUrl from '@fontsource-variable/reddit-sans/files/reddit-sans-latin-wght-normal.woff2?url';
+import plexMono500Url from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2?url';
+import plexMono700Url from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-700-normal.woff2?url';
 
 export interface Props {
   title: string;
   description: string;
-  image?: string;
 }
 
-const { title, description, image = '/og-image.png' } = Astro.props;
+const { title, description } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(image, Astro.site);
+const ogImageURL = new URL('/og-image.png', Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Icons. PNG first, SVG last: Chrome and Firefox take the last one
+         they support (the SVG); Safari skips the SVG and takes the PNG. The
+         ?v= is the only thing that gets a browser's favicon cache to refetch
+         — bump it whenever the icon changes. PNGs come from
+         scripts/generate-favicon.mjs. -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=3" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="generator" content="Astro" />
+    <link rel="preload" as="font" type="font/woff2" href={redditSansUrl} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={plexMono500Url} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={plexMono700Url} crossorigin />
     <meta name="description" content={description} />
     <meta name="author" content="Nathan Lemma" />
     <link rel="canonical" href={canonicalURL} />
@@ -42,73 +57,222 @@ const ogImageURL = new URL(image, Astro.site);
     <meta name="twitter:image" content={ogImageURL} />
 
     <title>{title} · Nathan Lemma</title>
-
-    <!-- Theme init before paint: stored choice wins, else system preference -->
+    <!-- Sweep phase from the wall clock, set before first paint, so the beam
+         carries on across page loads instead of restarting from the top. -->
     <script is:inline>
-      (() => {
-        const stored = localStorage.getItem('theme');
-        const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', stored === 'dark' || stored === 'light' ? stored : system);
+      document.documentElement.style.setProperty('--sweep-phase', -(Date.now() % 11000) + 'ms');
+      // The state, decided here rather than at the end of body: off is now a
+      // light screen, so a browser that lands on it would otherwise paint the
+      // tube's black first and flip to white. The rest of the power logic
+      // stays at the end of body, where the button and the filter defs exist,
+      // and reads the verdict off window.__crt rather than working it out a
+      // second time — two copies of this rule would have to be kept in step.
+      (function () {
+        var r = document.documentElement;
+        var chromium = !!(navigator.userAgentData && navigator.userAgentData.brands.some(function (b) { return b.brand === 'Chromium'; }));
+        // Safari and Firefox run the warp filter in software, so they stay
+        // flat whatever is stored.
+        var on = chromium;
+        if (chromium) { try { on = localStorage.getItem('crt-warp') !== '0'; } catch (e) {} }
+        r.classList.add(on ? 'warp' : 'flat');
+        r.dataset.theme = on ? 'dark' : 'light';
+        // The boot verdict, for the end-of-body script to read instead of
+        // working the same rule out again. It is a snapshot, not live state:
+        // after the button is pressed the classes on <html> are the truth.
+        window.__crtBoot = { chromium: chromium, on: on };
       })();
     </script>
+
   </head>
   <body>
-    <div class="bg" aria-hidden="true"><div class="bg-orbs"></div></div>
+    <div class="crt-sweep" aria-hidden="true"></div>
+    <div class="crt-glass" aria-hidden="true"></div>
+    <!-- Power. On: the whole CRT (html.warp — curve, lines, sweep, flicker,
+         grain). Off: html.flat, a flat screen with a steady glow in the same
+         set. LED red = off, green = on, grey = can't switch here (not
+         Chromium), where hovering it shows the note. aria-disabled rather
+         than disabled so the hover still fires in every browser. -->
+    <button class="crt-power" type="button" aria-pressed="false" aria-label="CRT effects" title="CRT effects">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 3v8" />
+        <path d="M7 6.5a7 7 0 1 0 10 0" />
+      </svg>
+    </button>
+    <span class="crt-power-note" id="crt-power-note" role="tooltip">Open this page in Chrome for the CRT effect!</span>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <Header />
-    <main id="main">
-      <slot />
-    </main>
-    <footer class="site-footer">
-      <div class="foot-white" title="Soli Deo Gloria" aria-hidden="true"></div>
-      <div class="container footer-row">
-        <p class="small footer-line">© 2026 Nathan Lemma · ;).</p>
+    <!-- The tube: a viewport-sized box that scrolls the page inside the
+         glass, so the barrel warp is applied per viewport, not per document. -->
+    <div class="tube">
+      <!-- The tablet's status bar. Pinned to the top of the screen with the
+           page scrolling under it; display:none unless html.flat, so the CRT
+           never sees it and it needs no JS to appear. Decorative, so the
+           clock is never announced. -->
+      <div class="ipad-status" aria-hidden="true">
+        <span class="ipad-clock"></span>
+        <span class="ipad-glyphs">
+          <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <path d="M1.4 4.2a9.4 9.4 0 0 1 13.2 0" />
+            <path d="M4 6.9a5.7 5.7 0 0 1 8 0" />
+            <path d="M6.6 9.5a2 2 0 0 1 2.8 0" />
+          </svg>
+          <svg viewBox="0 0 26 12" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="0.6" y="0.6" width="21" height="10.8" rx="3" opacity="0.45" />
+            <rect x="2.4" y="2.4" width="13" height="7.2" rx="1.6" fill="currentColor" stroke="none" />
+            <path d="M23.6 4.2v3.6" stroke-linecap="round" opacity="0.45" />
+          </svg>
+        </span>
       </div>
-    </footer>
+      <!-- Scanlines ride inside the tube, stuck to its top, so the warp bends
+           them with the glass in the same filter pass. -->
+      <div class="crt-lines" aria-hidden="true"></div>
+      <!-- Everything that scrolls, in one box. The doodle field is this
+           element's ::before, so it is exactly the document's height — no
+           bleed numbers tied to the header's or footer's padding, and no
+           overhang past the footer (an absolutely positioned descendant that
+           overhangs the block-end edge adds to .tube's scrollable overflow).
+           The scanlines and status bar stay outside it: they are sticky
+           against .tube, which is the screen, not the page. -->
+      <div class="doodle-field">
+        <!-- The one mark that stays a mark: the cross, once per page, low on
+             the paper. Same ink and weight as the field so it reads as part
+             of the same hand. -->
+        <span class="grace-mark" title="Soli Deo Gloria" aria-hidden="true">
+          <svg viewBox="0 0 110 160" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M56 18 C54 58, 53 104, 55 148" />
+            <path d="M24 56 C46 52, 73 52, 88 57" />
+          </svg>
+        </span>
+        <Header />
+        <main id="main">
+          <slot />
+        </main>
+        <footer class="site-footer">
+          <div class="container footer-row">
+            <p class="footer-line">© 2026 Nathan Lemma · ;).</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- Barrel warp: one displacement map, one displacement. The map is a
+         256² raster drawn by the script below. It has to be a raster: an SVG
+         image in a filter is rasterised at the filter region and re-sent to
+         the compositor every damaged frame, which is what made hover and
+         scroll crawl. sRGB so the neutral 50% grey stays 50%. -->
+    <svg class="crt-defs" aria-hidden="true" focusable="false">
+      <filter id="crt-warp" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+        <feImage id="crt-warp-src" result="map" preserveAspectRatio="none" />
+        <feDisplacementMap id="crt-warp-map" in="SourceGraphic" in2="map" scale="24" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+    <!-- The warp's moving parts. Runs before first paint, so the page never
+         shows the wrong state.
+         1. The map: R = ½ + w·x, G = ½ + w·y for x, y in [-½, ½], w = r² with
+            the corners at 1. Edges sample toward the centre: a barrel.
+         2. The strength: 24 at 900px, growing faster than linear — 49 at
+            1440, 74 at 1920 — because on a wide monitor the content sits far
+            from the edges where the curve shows. scale is an SVG attribute,
+            so no vw unit; only re-set when the value changes.
+         3. The switch: the power button. On = html.warp (the curve, on top
+            of every other CRT effect). Off = html.flat, which turns the
+            rest off too — a flat screen, steady glow, in the same set.
+            Remembered per visitor, on by default. Chromium only: Safari and
+            Firefox run this filter in software, so there the page is flat,
+            the button is grey and dead, and hovering it says why. -->
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        var btn = document.querySelector('.crt-power');
+        var KEY = 'crt-warp';
+
+        // The iPad's status-bar clock. It runs before the Chromium gate below,
+        // because a non-Chromium browser is exactly the case that always gets
+        // the iPad — gating it would leave the status bar blank there.
+        var clock = document.querySelector('.ipad-clock');
+        if (clock) {
+          (function tick() {
+            clock.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+            setTimeout(tick, 30000);
+          })();
+        }
+
+        if (!window.__crtBoot.chromium) {
+          root.classList.add('flat');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.setAttribute('aria-describedby', 'crt-power-note');
+          btn.removeAttribute('title');
+          return;
+        }
+
+        var N = 256, c = document.createElement('canvas');
+        c.width = c.height = N;
+        var ctx = c.getContext('2d'), img = ctx.createImageData(N, N), d = img.data;
+        for (var j = 0; j < N; j++) {
+          for (var i = 0; i < N; i++) {
+            var x = (i + 0.5) / N - 0.5, y = (j + 0.5) / N - 0.5;
+            var w = Math.min(1, 2 * (x * x + y * y)), k = 4 * (j * N + i);
+            d[k] = Math.round(255 * (0.5 + w * x));
+            d[k + 1] = Math.round(255 * (0.5 + w * y));
+            d[k + 3] = 255;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+        document.getElementById('crt-warp-src').setAttribute('href', c.toDataURL());
+
+        var map = document.getElementById('crt-warp-map'), last;
+        function fit() {
+          var s = String(Math.round(24 * Math.pow(innerWidth / 900, 1.5)));
+          if (s !== last) map.setAttribute('scale', last = s);
+        }
+        fit();
+        addEventListener('resize', fit);
+
+        function apply(on) {
+          root.classList.toggle('warp', on);
+          root.classList.toggle('flat', !on);
+          root.dataset.theme = on ? 'dark' : 'light';
+          btn.setAttribute('aria-pressed', String(on));
+        }
+        // the head script already decided this; don't re-derive it
+        apply(window.__crtBoot.on);
+        btn.addEventListener('click', function () {
+          var on = !root.classList.contains('warp');
+          apply(on);
+          try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+        });
+      })();
+    </script>
   </body>
 </html>
 
 <style>
-  /* Full-bleed white footer lifted by a top shadow; a cross planted on a
-     rock is cut out of it (right side, snapped to the bottom edge) so the
-     gradient shows through. The cross lives on its own layer — the text
-     sits above and is never touched by the mask. */
   .site-footer {
     position: relative;
-    background: transparent;
-    padding-block: 2.6rem 2.8rem;
-    min-height: 190px;
-    box-shadow: 0 -26px 54px -26px var(--slab-sh);
+    border-top: 1px solid var(--line);
+    padding-block: calc(var(--grid) * 2 - 1px) calc(var(--grid) * 2);
   }
 
-  .foot-white {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background: var(--paper);
-    /* Latin cross — equal top/left/right arms, shorter bottom — planted on a small
-       rock, centered along the footer's bottom edge. */
-    --cross-rock: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 14 64 70'><path fill='black' d='M28 18 H36 V34 H52 V42 H36 V70 H28 V42 H12 V34 H28 Z'/><path fill='black' d='M19 84 C 20 74 27 70 32 71 C 38 70 44 74 45 84 Z'/></svg>");
-    -webkit-mask: var(--cross-rock) 50% 100% / 62px 68px no-repeat, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: var(--cross-rock) 50% 100% / 62px 68px no-repeat, linear-gradient(#000 0 0);
-    mask-composite: exclude;
+  /* One confident marker stroke each, well off square, low in the page.
+     Placed against .doodle-field — the document — so they travel with the
+     paper like the doodle field does. Fixed px, like the doodles. */
+  .grace-mark {
+    right: clamp(1rem, 4vw, 4rem);
+    bottom: 96px;
+    width: 150px;
+    rotate: -9deg;
   }
 
   .footer-row {
-    position: relative;
-    z-index: 1;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-2) var(--space-8);
-    border-top: 1.5px solid color-mix(in oklch, var(--ink) 16%, transparent);
-    padding-top: var(--space-4);
+    gap: var(--space-4);
   }
 
   .footer-line {
     color: var(--ink-3);
     font-family: var(--font-mono);
-    font-size: var(--text-small);
+    font-size: calc(var(--grid) * 0.46);
+    line-height: var(--grid);
+    letter-spacing: 0.04em;
   }
+
 </style>
