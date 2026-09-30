@@ -5,18 +5,20 @@
    below it, and a round power button in that chin. The page scrolls
    inside .tube, which is that screen.
 
-   The button switches two states, and every token below is written
+   The button switches two designs, and every token below is written
    twice — once here for :root, once in the html.flat block:
 
-     html.warp  the CRT. Deep tube black, cream and amber phosphor,
-                scanlines, a drifting refresh sweep, heading glow and
-                flicker, grain, and a live barrel warp (Chromium only,
-                since Safari and Firefox run that filter in software).
+     (default)  the CRT. Deep tube black, cream and amber phosphor, heading
+                glow, grain, and its effects: scanlines, a drifting refresh
+                sweep, flicker, and a live barrel warp (html.warp: Chromium
+                at >= 900px only, since Safari and Firefox run that filter in
+                software). html.calm is the CRT with its effects off.
      html.flat  an iPad. Cool light canvas, white cards, a dot grid,
                 one tint, no glow, sans sentence case.
 
    So: there IS a light theme, it is not a "paper mode" of the CRT but
-   its opposite, and the warp is deliberately Chromium-only. Anything
+   its opposite. Both designs run in every browser; only the warp is
+   engine-gated. The choice is made in BaseLayout's head script. Anything
    that must survive both states belongs in :root, not in either block.
 
    Type: IBM Plex Mono for headings and readouts, Reddit Sans for body
@@ -75,7 +77,15 @@
   --chin: clamp(30px, 2.6vw, 48px);
   --screen-radius: clamp(14px, 2vw, 28px);
   --led-on: oklch(0.8 0.2 145);
-  --led-size: clamp(18px, 1.4vw, 26px);
+  /* never under the 24px minimum target; the 30px chin still holds it */
+  --led-size: clamp(24px, 1.6vw, 28px);
+  /* Where the screen sits in the set. The bezel, or the phone's notch and
+     rounded corners if those reach further in (viewport-fit=cover lets the
+     page draw under them); the chin stacks on top of the home indicator. */
+  --inset-top: max(var(--bezel), env(safe-area-inset-top, 0px));
+  --inset-right: max(var(--bezel), env(safe-area-inset-right, 0px));
+  --inset-left: max(var(--bezel), env(safe-area-inset-left, 0px));
+  --inset-bottom: calc(var(--chin) + env(safe-area-inset-bottom, 0px));
   /* the tomato's stem: the LED green, a step darker */
   --stem: oklch(0.68 0.17 145);
   --container: 64rem;
@@ -140,7 +150,7 @@ html.menu-open .tube { overflow: hidden; }
    clip on the filtered surface would only be a second mask. */
 .tube {
   position: fixed;
-  inset: var(--bezel) var(--bezel) var(--chin);
+  inset: var(--inset-top) var(--inset-right) var(--inset-bottom) var(--inset-left);
   overflow: auto;
   overscroll-behavior: contain;
   scroll-behavior: smooth;
@@ -148,9 +158,9 @@ html.menu-open .tube { overflow: hidden; }
   background-color: var(--bg);
 }
 
-/* Barrel warp. Switched by html.warp — the power button on the chin, on by
-   default. Chromium only: Safari and Firefox run this filter in software,
-   so there the button is grey and disabled and the class is never set.
+/* Barrel warp. html.warp is set for the CRT with effects on, in Chromium
+   only: Safari and Firefox run this filter in software, so there the CRT
+   runs every other effect and just stays flat.
    Desktop only: on a phone the filter would cost battery and turn
    the drawer's position: fixed into position: absolute. The strength is the
    filter's scale attribute, set from the viewport width by the script in
@@ -204,7 +214,7 @@ body {
 /* The sweep stops at the glass edge, not the bezel. Corners are under the
    bezel, so no radius here either. */
 .crt-sweep {
-  inset: var(--bezel) var(--bezel) var(--chin);
+  inset: var(--inset-top) var(--inset-right) var(--inset-bottom) var(--inset-left);
 }
 
 /* The refresh. On a real tube the lines never move; what drifts is the
@@ -275,8 +285,8 @@ body {
    black and never seen). Inset shadows stand in for the glass curving away
    into the corners; the top-left glare is the room reflected in it. */
 .crt-glass {
-  border: var(--bezel) solid var(--set);
-  border-bottom-width: var(--chin);
+  border: 0 solid var(--set);
+  border-width: var(--inset-top) var(--inset-right) var(--inset-bottom) var(--inset-left);
   border-radius: calc(var(--screen-radius) + var(--bezel));
   border-bottom-left-radius: calc(var(--screen-radius) + var(--bezel)) calc(var(--screen-radius) + var(--chin));
   border-bottom-right-radius: calc(var(--screen-radius) + var(--bezel)) calc(var(--screen-radius) + var(--chin));
@@ -291,21 +301,15 @@ body {
 }
 
 /* ---- Power ----
-   On the chin, bottom right. Switches the CRT: html.warp on, html.flat off.
-   The LED is the state: red while it's off, green while it's on, grey and
-   unlit where it can't be switched (outside Chromium the layout script
-   marks it aria-disabled and the page stays flat). Only where the warp
-   exists (≥ 900px). */
-.crt-power {
+   Switches the design: pressed is the CRT, not pressed the tablet. The LED
+   is the state: green for the CRT, red for the tablet. Two of them, one
+   styling: .crt-power on the chin wherever the chin exists (>= 721px), and
+   .hd-power in the phone header (Header.astro). Both need the script, so
+   neither shows without html.js. */
+.power-btn {
   --led: var(--hot);
-  position: fixed;
-  right: calc(var(--bezel) + 14px);
-  bottom: calc((var(--chin) - var(--led-size)) / 2);
-  z-index: 65;
   display: none;
   place-items: center;
-  width: var(--led-size);
-  height: var(--led-size);
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 50%;
@@ -314,59 +318,23 @@ body {
   cursor: pointer;
   box-shadow: 0 0 6px 1px var(--led), 0 0 14px var(--led);
 }
-.crt-power svg { width: 60%; height: 60%; }
-.crt-power:hover { box-shadow: 0 0 8px 2px var(--led), 0 0 20px var(--led); }
-.crt-power:focus-visible { border-radius: 50%; }
-html.warp .crt-power { --led: var(--led-on); }
-.crt-power[aria-disabled="true"],
-.crt-power[aria-disabled="true"]:hover {
-  --led: oklch(0.45 0 0);
-  box-shadow: none;
-  cursor: not-allowed;
-}
+.power-btn svg { width: 60%; height: 60%; }
+.power-btn:hover { box-shadow: 0 0 8px 2px var(--led), 0 0 20px var(--led); }
+.power-btn:focus-visible { border-radius: 50%; }
+.power-btn[aria-pressed='true'] { --led: var(--led-on); }
 
-/* The note a dead button shows on hover or focus: a small panel on the
-   glass just above the chin, right-aligned to the button, with a caret. */
-.crt-power-note {
+/* on the chin, bottom right, clear of the home indicator */
+.crt-power {
   position: fixed;
-  right: calc(var(--bezel) + 14px);
-  bottom: calc(var(--chin) + 10px);
+  right: calc(var(--inset-right) + 14px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + (var(--chin) - var(--led-size)) / 2);
   z-index: 65;
-  max-width: 24ch;
-  padding: var(--space-2) var(--space-3);
-  font-family: var(--font-mono);
-  font-size: var(--text-label);
-  line-height: 1.4;
-  letter-spacing: 0.02em;
-  color: var(--amber);
-  background: var(--panel);
-  border: 1px solid color-mix(in oklch, var(--amber) 45%, transparent);
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 120ms var(--ease), visibility 0s linear 120ms;
-}
-.crt-power-note::after {
-  content: '';
-  position: absolute;
-  right: calc(var(--led-size) / 2 - 5px);
-  bottom: -6px;
-  width: 10px;
-  height: 10px;
-  background: var(--panel);
-  border-right: 1px solid color-mix(in oklch, var(--amber) 45%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--amber) 45%, transparent);
-  rotate: 45deg;
-}
-.crt-power[aria-disabled="true"]:hover + .crt-power-note,
-.crt-power[aria-disabled="true"]:focus-visible + .crt-power-note {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
+  width: var(--led-size);
+  height: var(--led-size);
 }
 
-@media (min-width: 900px) {
-  .crt-power { display: grid; }
+@media (min-width: 721px) {
+  html.js .crt-power { display: grid; }
 }
 
 /* ---- Power off: the iPad ----
@@ -376,8 +344,8 @@ html.warp .crt-power { --led: var(--led-on); }
    canvas, white cards, one tint, no texture. The structural rules further
    down are the ones this state always had — sans, sentence case, radii, no
    grain, no brackets, no glow; only the token values flip dark to light.
-   This is also what a non-Chromium browser gets, since the curve can't run
-   there. */
+   This is also what a non-Chromium browser gets until the visitor chooses
+   otherwise, as it always has. */
 html.flat {
   color-scheme: light;
 
@@ -432,6 +400,21 @@ html.flat {
 
 html.flat .crt-lines,
 html.flat .crt-sweep { display: none; }
+
+/* ---- The CRT, effects off ----
+   Same tube, colours and glow, held still: no scanlines, no sweep, no
+   flicker, and (html.warp never set) no curve. The default under
+   prefers-reduced-motion, and a steadier read for anyone else. */
+html.calm .crt-lines,
+html.calm .crt-sweep { display: none; }
+html.calm .display,
+html.calm h1,
+html.calm h2,
+html.calm h3,
+html.calm .sec-head .sec-label {
+  animation: none;
+  text-shadow: var(--glow-rest);
+}
 
 /* An iPad's glass isn't inert either, but a glare can't brighten a white
    screen — so the sheen darkens: a cool wash falling off the top-left, plus
@@ -547,7 +530,7 @@ html.flat .ipad-glyphs svg { height: 11px; width: auto; display: block; }
 
 /* the current tab as a segmented-control pill: an inset 2px underline inside
    a capsule lands on the curve and reads as a rendering bug */
-html.flat .tab[aria-current='page'] {
+html.flat .tab[aria-current] {
   color: var(--ink);
   background: var(--panel);
   border-color: transparent;
@@ -564,6 +547,9 @@ main,
 .site-header { z-index: 2; }
 
 main { display: block; }
+/* Focusable only so the skip link can land there (tabindex -1). A ring
+   round the whole page would mark nothing a visitor can act on. */
+main:focus { outline: none; }
 
 h1, h2, h3, h4 { color: var(--ink); }
 
@@ -868,7 +854,7 @@ html.flat .doodle-field {
 .skip-link {
   position: fixed;
   top: -100%;
-  left: 1rem;
+  left: calc(1rem + env(safe-area-inset-left, 0px));
   z-index: var(--z-skip);
   font-family: var(--font-mono);
   font-size: calc(var(--grid) * 0.5);
@@ -881,15 +867,15 @@ html.flat .doodle-field {
   padding: calc(var(--grid) * 0.25 - 1px) calc(var(--grid) * 0.75);
   text-decoration: none;
 }
-.skip-link:focus-visible { top: 1rem; }
+.skip-link:focus-visible { top: calc(1rem + env(safe-area-inset-top, 0px)); }
 
 /* ---- Phone ----
    The desktop rhythm is built from 28px cells, which on a 390px screen spends
    most of the first viewport on air. Everything structural already stacks; this
    only tightens the spacing and the chrome. */
-/* Phones get the screen, not the set: no bezel, no chin, no power button
-   (that one is already desktop-only). A 12px frame around a 390px screen is
-   just lost width, and there is no CRT toggle down here to justify it. */
+/* Phones get the screen, not the set: no bezel, no chin. A 12px frame around
+   a 390px screen is just lost width; the power button moves into the header
+   instead (.hd-power in Header.astro). */
 @media (max-width: 720px) {
   :root {
     --bezel: 0px;
@@ -919,4 +905,70 @@ html.flat .doodle-field {
     transition-duration: 0.01ms !important;
   }
   .btn:hover { transform: none; }
+}
+
+/* ---- Print ----
+   On screen the page lives in a fixed, viewport-sized .tube, which on paper
+   is one clipped page. Here the tube goes back into the flow, the set and
+   its glass go, and either design prints as dark ink on white: browsers
+   drop backgrounds by default, which would leave the CRT's cream text on
+   white paper. html:root outranks both :root and html.flat. */
+@media print {
+  html:root {
+    color-scheme: light;
+    --bezel: 0px;
+    --chin: 0px;
+    --bg: #fff;
+    --panel: #fff;
+    --panel-2: #fff;
+    --ink: #111;
+    --ink-2: #333;
+    --ink-3: #555;
+    --hot: oklch(0.5 0.19 30);
+    --amber: oklch(0.48 0.12 60);
+    --sweep: var(--hot);
+    --on-accent: #fff;
+    --line: #bbb;
+    --line-2: #ddd;
+    --glow-rest: none;
+    --glow-shine: none;
+    --glow-hot: transparent;
+    --grain: none;
+  }
+
+  html,
+  body {
+    height: auto;
+    overflow: visible;
+    background: #fff;
+  }
+
+  .tube {
+    position: static;
+    overflow: visible;
+    filter: none !important;
+    background: #fff;
+  }
+
+  .skip-link,
+  .crt-sweep,
+  .crt-glass,
+  .crt-lines,
+  .ipad-status,
+  .power-btn,
+  .display-prefs,
+  .menu-btn,
+  .menu-scrim,
+  .drawer,
+  .grace-mark { display: none !important; }
+
+  .doodle-field { min-height: 0; background-image: none !important; }
+  .doodle-field::before { content: none !important; }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    text-shadow: none !important;
+  }
 }

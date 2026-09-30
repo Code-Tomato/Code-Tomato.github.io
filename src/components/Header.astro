@@ -1,6 +1,9 @@
 ---
-const currentPath = Astro.url.pathname;
-const isActive = (path: string) => currentPath === path || currentPath === `${path}/`;
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+// 'page' only for the page itself. A project detail page keeps Projects lit,
+// but as the section it sits in ('location'), not as the page being shown.
+const current = (path: string) =>
+  currentPath === path ? 'page' : currentPath.startsWith(`${path}/`) ? 'location' : undefined;
 
 const links = [
   { href: '/projects', label: 'Projects' },
@@ -22,6 +25,15 @@ const links = [
       <span class="brand-name">Nathan Lemma</span>
     </a>
 
+    <!-- The chin's power button, for phones, which have no chin. Wired up
+         with the other display controls in BaseLayout. -->
+    <button class="power-btn hd-power" type="button" data-pref="design" aria-pressed="false" aria-label="CRT design" title="CRT design (off: light tablet)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 3v8" />
+        <path d="M7 6.5a7 7 0 1 0 10 0" />
+      </svg>
+    </button>
+
     <button
       class="menu-btn"
       type="button"
@@ -37,7 +49,7 @@ const links = [
     <nav class="tabs" aria-label="Main">
       {
         links.map((link) => (
-          <a href={link.href} class="tab" aria-current={isActive(link.href) ? 'page' : undefined}>
+          <a href={link.href} class="tab" aria-current={current(link.href)}>
             {link.label}
           </a>
         ))
@@ -54,7 +66,7 @@ const links = [
     </button>
     {
       links.map((link) => (
-        <a href={link.href} class="drawer-link" aria-current={isActive(link.href) ? 'page' : undefined}>
+        <a href={link.href} class="drawer-link" aria-current={current(link.href)}>
           {link.label}
         </a>
       ))
@@ -135,10 +147,27 @@ const links = [
     border-color: color-mix(in oklch, var(--amber) 50%, transparent);
   }
 
-  .tab[aria-current='page'] {
+  /* the page itself, or the section a detail page sits in: same cue */
+  .tab[aria-current] {
     color: var(--amber);
     border-color: color-mix(in oklch, var(--amber) 50%, transparent);
     box-shadow: inset 0 -2px 0 var(--hot);
+  }
+
+  /* Phones only (see the 720 block). Sized to sit level with the menu
+     button's bars; margin-left:auto pairs it with that button at the right
+     rather than letting space-between park it mid-row. */
+  .hd-power {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    margin-left: auto;
+  }
+  /* on the tablet's light canvas the chin's black puck reads as a hole */
+  :global(html.flat) .hd-power {
+    background: transparent;
+    border-color: var(--line);
+    box-shadow: none;
   }
 
 
@@ -197,6 +226,10 @@ const links = [
     background-size: 110px 110px;
     background-blend-mode: overlay;
     border-left: 1px solid var(--line);
+    /* clear of a notch or the home indicator where the phone has them */
+    padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+    padding-right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
+    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
     visibility: hidden;
     translate: 100% 0;
     /* visibility flips instantly on the way in so the close button is
@@ -214,7 +247,7 @@ const links = [
   /* The drawer is fixed to the viewport, but in flat the header sits below
      the status bar. Without this the close button rides above the hamburger
      it replaces. */
-  :global(html.flat) .drawer { padding-top: calc(var(--space-3) + var(--status-h)); }
+  :global(html.flat) .drawer { padding-top: calc(var(--space-3) + var(--status-h) + env(safe-area-inset-top, 0px)); }
 
   .menu-close {
     align-self: flex-end;
@@ -249,7 +282,7 @@ const links = [
 
   .drawer-link:last-child { border-bottom: none; }
   .drawer-link:hover { color: var(--amber); }
-  .drawer-link[aria-current='page'] { color: var(--amber); }
+  .drawer-link[aria-current] { color: var(--amber); }
 
   @media (prefers-reduced-motion: reduce) {
     .drawer, .menu-scrim { transition: none; }
@@ -267,19 +300,27 @@ const links = [
     .menu-scrim { display: none; }
   }
 
+  /* The drawer is JavaScript's to open, so the phone layout only swaps the
+     tabs for it once html.js says the script is there (the head script sets
+     it before first paint). Without it the tabs stay, as the compact plain
+     labels below, wrapping under the name if they have to. */
   @media (max-width: 720px) {
     .site-header { padding-block: var(--space-3) var(--space-3); }
-    .tabs { display: none; }
-    .menu-btn,
-    .menu-close { display: flex; }
+    :global(html.js) .tabs { display: none; }
+    :global(html.js) .menu-btn,
+    :global(html.js) .menu-close { display: flex; }
+    :global(html.js) .hd-power { display: grid; }
 
-    /* One line, always: the boxes around the tabs are what made the row wrap,
-       so on a phone they become plain labels instead of rack units. */
-    .hd-row { gap: var(--space-2); flex-wrap: nowrap; }
+    /* With the script, one line always: name, power, menu. */
+    .hd-row { gap: var(--space-1) var(--space-2); }
+    :global(html.js) .hd-row { flex-wrap: nowrap; }
     .mark { width: calc(var(--grid) * 1.15); height: calc(var(--grid) * 1.15); }
-    .brand-name { font-size: 0.88rem; white-space: nowrap; }
+    /* The name stays at every width; at 320px with enlarged text it breaks
+       onto two lines rather than pushing the buttons off the row. */
+    .brand { min-width: 0; }
+    .brand-name { font-size: 0.88rem; }
 
-    .tabs { gap: var(--space-3); flex-wrap: nowrap; }
+    .tabs { gap: var(--space-1) var(--space-3); flex-wrap: wrap; }
     .tab {
       background: transparent;
       border: none;
@@ -288,12 +329,7 @@ const links = [
       letter-spacing: 0.03em;
       white-space: nowrap;
     }
-    .tab[aria-current='page'] { box-shadow: inset 0 -2px 0 var(--hot); }
-  }
-
-  /* Narrower than a 390 phone: the mark carries the identity on its own. */
-  @media (max-width: 520px) {
-    .brand-name { display: none; }
+    .tab[aria-current] { box-shadow: inset 0 -2px 0 var(--hot); }
   }
 </style>
 
@@ -305,13 +341,28 @@ const links = [
   const closeBtn = document.querySelector<HTMLButtonElement>('.menu-close');
 
   if (toggle && drawer && scrim && closeBtn) {
-    // While the drawer is open the rest of the page is inert, so Tab can't
-    // walk into content sitting behind the scrim.
+    const isOpen = () => html.classList.contains('menu-open');
+
+    // While the drawer is open everything else that can take focus is inert.
+    // The skip link and the chin's power button live outside the header, so
+    // they are named here alongside the header row, main and the footer.
     const background = () =>
-      [document.querySelector('.hd-row'), document.querySelector('main'), document.querySelector('.site-footer')]
-        .filter((el): el is HTMLElement => el instanceof HTMLElement);
+      Array.from(document.querySelectorAll<HTMLElement>('.skip-link, .crt-power, .hd-row, main, .site-footer'));
+
+    const focusables = () =>
+      Array.from(drawer.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'));
+
+    // The scrim is hidden after its fade, by one timer at a time. Opening
+    // cancels it: a hide left over from a close that a quick reopen overtook
+    // used to fire mid-open and strip the backdrop from an open drawer.
+    let hideTimer: number | undefined;
+
+    // what last had focus inside the drawer, for a resize that closes it
+    let lastInDrawer: HTMLElement | null = null;
+    drawer.addEventListener('focusin', (e) => { lastInDrawer = e.target as HTMLElement; });
 
     const open = () => {
+      window.clearTimeout(hideTimer);
       html.classList.add('menu-open');
       toggle.setAttribute('aria-expanded', 'true');
       scrim.hidden = false;
@@ -321,36 +372,65 @@ const links = [
       closeBtn.focus();
     };
 
-    const close = () => {
+    const close = (returnFocus = true) => {
+      if (!isOpen()) return;
       html.classList.remove('menu-open');
       toggle.setAttribute('aria-expanded', 'false');
       drawer.setAttribute('inert', '');
       // un-inert before focusing: the toggle lives inside the header row
       background().forEach((el) => el.removeAttribute('inert'));
-      toggle.focus();
-      // keep the scrim around until it has faded
-      const done = () => { scrim.hidden = true; };
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
-      else scrim.addEventListener('transitionend', done, { once: true });
+      if (returnFocus) toggle.focus();
+      // keep the scrim until it has faded (240ms), and only if still shut
+      window.clearTimeout(hideTimer);
+      const fade = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 260;
+      hideTimer = window.setTimeout(() => { if (!isOpen()) scrim.hidden = true; }, fade);
     };
 
-    toggle.addEventListener('click', () => {
-      html.classList.contains('menu-open') ? close() : open();
-    });
-    closeBtn.addEventListener('click', close);
-    scrim.addEventListener('click', close);
+    toggle.addEventListener('click', () => (isOpen() ? close() : open()));
+    closeBtn.addEventListener('click', () => close());
+    scrim.addEventListener('click', () => close());
     drawer.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).closest('a')) close();
     });
+
+    // Escape closes; Tab and Shift+Tab go round the drawer. Every step is
+    // taken here rather than left to the browser: Safari's default keyboard
+    // setting leaves links out of the native Tab order, so from the close
+    // button a native Tab skipped all four links and left for the toolbar.
+    // Focus found anywhere unexpected (outside the drawer, or on something
+    // no longer in the list) restarts at the first item, or the last going
+    // backwards. Ctrl/Alt/Cmd+Tab stay the browser's.
     addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && html.classList.contains('menu-open')) close();
+      if (!isOpen()) return;
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+      const items = focusables();
+      if (!items.length) return;
+      e.preventDefault();
+      const at = items.indexOf(document.activeElement as HTMLElement);
+      const step = e.shiftKey ? -1 : 1;
+      const next = at === -1 ? (e.shiftKey ? items.length - 1 : 0) : (at + step + items.length) % items.length;
+      items[next].focus();
     });
-    // A resize past the breakpoint should not leave a drawer open behind the
-    // tabs. 721px is where the CSS actually swaps the drawer for the tab row
-    // (see the @media pair below); this used to say 641 and so closed the
-    // drawer while it was still the only nav on screen.
+
+    // A resize past the breakpoint closes the drawer: 721px is where the CSS
+    // swaps it for the tab row. The toggle vanishes at that width too, so
+    // focus goes to the tab for the link that had it (or the current tab)
+    // instead of back to a button that is no longer there.
     matchMedia('(min-width: 721px)').addEventListener('change', (e) => {
-      if (e.matches && html.classList.contains('menu-open')) close();
+      if (!e.matches || !isOpen()) return;
+      const href = lastInDrawer?.getAttribute('href');
+      close(false);
+      const tabs = Array.from(document.querySelectorAll<HTMLElement>('.tabs .tab'));
+      const target =
+        tabs.find((t) => href && t.getAttribute('href') === href) ??
+        tabs.find((t) => t.hasAttribute('aria-current')) ??
+        tabs[0];
+      target?.focus();
     });
+
+    // Never leave a page with the drawer open: a back/forward cache restore
+    // would bring it back open with the page behind it inert.
+    addEventListener('pagehide', () => close(false));
   }
 </script>

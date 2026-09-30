@@ -61,45 +61,77 @@ const ogImageURL = new URL('/og-image.png', Astro.site);
          carries on across page loads instead of restarting from the top. -->
     <script is:inline>
       document.documentElement.style.setProperty('--sweep-phase', -(Date.now() % 11000) + 'ms');
-      // The state, decided here rather than at the end of body: off is now a
-      // light screen, so a browser that lands on it would otherwise paint the
-      // tube's black first and flip to white. The rest of the power logic
-      // stays at the end of body, where the button and the filter defs exist,
-      // and reads the verdict off window.__crt rather than working it out a
-      // second time — two copies of this rule would have to be kept in step.
+      // The display, decided here rather than at the end of body so the first
+      // paint is already right: a tablet visitor would otherwise see the
+      // tube's black flash to white. Two independent choices, each remembered
+      // once the visitor makes it:
+      //   design   'crt' (the dark tube) or 'tablet' (the light iPad: html.flat)
+      //   effects  'on' or 'off' (off: html.calm). Scanlines, the refresh
+      //            sweep, heading flicker, and the barrel warp where it can
+      //            run. Only the CRT has any.
+      // Nothing stored: the CRT on Chromium and the tablet elsewhere, as the
+      // site has always shipped, with effects on unless the OS asks for
+      // reduced motion. Either design works in every browser; the warp
+      // (html.warp) is the one engine-gated piece, since Safari and Firefox
+      // run that filter in software, and the CSS gates it to >= 900px too.
+      // Storage can throw (privacy modes, blocked storage), so every access is
+      // guarded: the choice then holds for this page and is forgotten after.
+      // The end-of-body script wires the controls to window.__display rather
+      // than working any of this out a second time.
       (function () {
         var r = document.documentElement;
-        var chromium = !!(navigator.userAgentData && navigator.userAgentData.brands.some(function (b) { return b.brand === 'Chromium'; }));
-        // Safari and Firefox run the warp filter in software, so they stay
-        // flat whatever is stored.
-        var on = chromium;
-        if (chromium) { try { on = localStorage.getItem('crt-warp') !== '0'; } catch (e) {} }
-        r.classList.add(on ? 'warp' : 'flat');
-        r.dataset.theme = on ? 'dark' : 'light';
-        // The boot verdict, for the end-of-body script to read instead of
-        // working the same rule out again. It is a snapshot, not live state:
-        // after the button is pressed the classes on <html> are the truth.
-        window.__crtBoot = { chromium: chromium, on: on };
+        r.classList.add('js');
+        function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+        function put(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+        var chromium = !!(navigator.userAgentData && navigator.userAgentData.brands && navigator.userAgentData.brands.some(function (b) { return b.brand === 'Chromium'; }));
+
+        var d = window.__display = {
+          chromium: chromium,
+          // Read (or re-read) the stored choices. Also run when a page comes
+          // back from the back/forward cache, so it shows what the visitor
+          // chose on the pages since, not what it showed when it was left.
+          load: function () {
+            var design = get('display-design');
+            if (design !== 'crt' && design !== 'tablet') {
+              // The old Chromium-only power button's key: '1' CRT, '0' tablet.
+              // Moved over once, and only dropped after the new key is written.
+              var old = get('crt-warp');
+              design = old === '1' ? 'crt' : old === '0' ? 'tablet' : null;
+              if (design && put('display-design', design)) { try { localStorage.removeItem('crt-warp'); } catch (e) {} }
+            }
+            var effects = get('display-effects');
+            if (effects !== 'on' && effects !== 'off') effects = null;
+            var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+            d.design = design || (chromium ? 'crt' : 'tablet');
+            d.effects = effects || (reduce ? 'off' : 'on');
+            // an explicit choice outranks a later change to the OS setting
+            d.effectsChosen = !!effects;
+          },
+          apply: function () {
+            var crt = d.design === 'crt', fx = crt && d.effects === 'on';
+            r.classList.toggle('flat', !crt);
+            r.classList.toggle('calm', crt && !fx);
+            r.classList.toggle('warp', fx && chromium);
+            r.dataset.theme = crt ? 'dark' : 'light';
+          },
+          set: function (key, value) {
+            d[key] = value;
+            if (key === 'effects') d.effectsChosen = true;
+            put('display-' + key, value);
+            d.apply();
+          }
+        };
+        d.load();
+        d.apply();
       })();
     </script>
 
   </head>
   <body>
+    <!-- First in the document, so it is the first thing Tab reaches. -->
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="crt-sweep" aria-hidden="true"></div>
     <div class="crt-glass" aria-hidden="true"></div>
-    <!-- Power. On: the whole CRT (html.warp — curve, lines, sweep, flicker,
-         grain). Off: html.flat, a flat screen with a steady glow in the same
-         set. LED red = off, green = on, grey = can't switch here (not
-         Chromium), where hovering it shows the note. aria-disabled rather
-         than disabled so the hover still fires in every browser. -->
-    <button class="crt-power" type="button" aria-pressed="false" aria-label="CRT effects" title="CRT effects">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
-        <path d="M12 3v8" />
-        <path d="M7 6.5a7 7 0 1 0 10 0" />
-      </svg>
-    </button>
-    <span class="crt-power-note" id="crt-power-note" role="tooltip">Open this page in Chrome for the CRT effect!</span>
-    <a href="#main" class="skip-link">Skip to main content</a>
     <!-- The tube: a viewport-sized box that scrolls the page inside the
          glass, so the barrel warp is applied per viewport, not per document. -->
     <div class="tube">
@@ -143,16 +175,45 @@ const ogImageURL = new URL('/og-image.png', Astro.site);
           </svg>
         </span>
         <Header />
-        <main id="main">
+        <!-- tabindex -1: the skip link's target has to take focus, so the
+             next Tab and the keyboard scroll keys start inside the page -->
+        <main id="main" tabindex="-1">
           <slot />
         </main>
         <footer class="site-footer">
           <div class="container footer-row">
             <p class="footer-line">© 2026 Nathan Lemma · ;).</p>
+            <!-- The display settings, in the page's own flow so they scale
+                 with text and never sit over content. Shown by html.js: with
+                 no script there is nothing to switch. -->
+            <div class="display-prefs">
+              <div class="pref" role="group" aria-labelledby="pref-design">
+                <span class="pref-label" id="pref-design">Design</span>
+                <button class="pref-opt" type="button" data-pref="design" data-value="crt" aria-pressed="false">Dark CRT</button>
+                <button class="pref-opt" type="button" data-pref="design" data-value="tablet" aria-pressed="false">Light tablet</button>
+              </div>
+              <div class="pref" role="group" aria-labelledby="pref-effects" aria-describedby="pref-effects-note">
+                <span class="pref-label" id="pref-effects">Effects</span>
+                <button class="pref-opt" type="button" data-pref="effects" data-value="on" aria-pressed="false">On</button>
+                <button class="pref-opt" type="button" data-pref="effects" data-value="off" aria-pressed="false">Off</button>
+                <!-- rewritten by the script to name only what runs here -->
+                <span class="visually-hidden" id="pref-effects-note">Scanlines, plus, where this browser and screen support them, a refresh sweep, heading flicker and screen curve. Dark CRT only.</span>
+              </div>
+            </div>
           </div>
         </footer>
       </div>
     </div>
+    <!-- Power, on the chin, bottom right, wherever the chin exists (>= 721px;
+         the phone header carries the same button). Pressed = the dark CRT,
+         not pressed = the light tablet, in every browser. LED green = CRT,
+         red = tablet. Last in the document, matching where it sits. -->
+    <button class="power-btn crt-power" type="button" data-pref="design" aria-pressed="false" aria-label="CRT design" title="CRT design (off: light tablet)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 3v8" />
+        <path d="M7 6.5a7 7 0 1 0 10 0" />
+      </svg>
+    </button>
     <!-- Barrel warp: one displacement map, one displacement. The map is a
          256² raster drawn by the script below. It has to be a raster: an SVG
          image in a filter is rasterised at the filter region and re-sent to
@@ -164,29 +225,37 @@ const ogImageURL = new URL('/og-image.png', Astro.site);
         <feDisplacementMap id="crt-warp-map" in="SourceGraphic" in2="map" scale="24" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </svg>
-    <!-- The warp's moving parts. Runs before first paint, so the page never
-         shows the wrong state.
-         1. The map: R = ½ + w·x, G = ½ + w·y for x, y in [-½, ½], w = r² with
-            the corners at 1. Edges sample toward the centre: a barrel.
-         2. The strength: 24 at 900px, growing faster than linear — 49 at
-            1440, 74 at 1920 — because on a wide monitor the content sits far
-            from the edges where the curve shows. scale is an SVG attribute,
-            so no vw unit; only re-set when the value changes.
-         3. The switch: the power button. On = html.warp (the curve, on top
-            of every other CRT effect). Off = html.flat, which turns the
-            rest off too — a flat screen, steady glow, in the same set.
-            Remembered per visitor, on by default. Chromium only: Safari and
-            Firefox run this filter in software, so there the page is flat,
-            the button is grey and dead, and hovering it says why. -->
+    <!-- Everything that needs the finished DOM, before first paint.
+         1. The warp map: R = ½ + w·x, G = ½ + w·y for x, y in [-½, ½], w = r²
+            with the corners at 1. Edges sample toward the centre: a barrel.
+            Drawn the first time the warp is actually shown (html.warp at
+            >= 900px), so no other visitor pays for it.
+         2. The warp strength: 24 at 900px, growing faster than linear — 49
+            at 1440, 74 at 1920 — because on a wide monitor the content sits
+            far from the edges where the curve shows. scale is an SVG
+            attribute, so no vw unit; only re-set when the value changes.
+         3. The display controls: every [data-pref] button. With a
+            data-value it selects that value; without one (the power
+            buttons) it flips the design. A change keeps the reader's place:
+            the fonts and the tablet's status bar move the text, so the first
+            block on screen is pinned where it was.
+         4. The keyboard. The document never scrolls — .tube does — so with
+            nothing focused, PageDown and friends went nowhere until the
+            visitor clicked into the page. Those keys are handed to the tube
+            instead. Nothing is focused on their behalf.
+         5. Scroll memory. Browsers restore the document's scroll on back and
+            forward, which is always 0 here. So the tube's offset is kept
+            per history entry: a key in history.state, the offset in
+            sessionStorage. A new visit has a fresh entry and restores
+            nothing, so links and #hash targets behave as normal. A
+            back/forward cache hit keeps the live page, offset included. -->
     <script is:inline>
       (function () {
-        var root = document.documentElement;
-        var btn = document.querySelector('.crt-power');
-        var KEY = 'crt-warp';
+        var root = document.documentElement, d = window.__display;
+        var tube = document.querySelector('.tube');
+        if (!d || !tube) return;
 
-        // The iPad's status-bar clock. It runs before the Chromium gate below,
-        // because a non-Chromium browser is exactly the case that always gets
-        // the iPad — gating it would leave the status bar blank there.
+        // The iPad's status-bar clock.
         var clock = document.querySelector('.ipad-clock');
         if (clock) {
           (function tick() {
@@ -195,49 +264,258 @@ const ogImageURL = new URL('/og-image.png', Astro.site);
           })();
         }
 
-        if (!window.__crtBoot.chromium) {
-          root.classList.add('flat');
-          btn.setAttribute('aria-disabled', 'true');
-          btn.setAttribute('aria-describedby', 'crt-power-note');
-          btn.removeAttribute('title');
-          return;
+        function listen(mq, fn) {
+          if (mq.addEventListener) mq.addEventListener('change', fn);
+          else if (mq.addListener) mq.addListener(fn);
         }
 
-        var N = 256, c = document.createElement('canvas');
-        c.width = c.height = N;
-        var ctx = c.getContext('2d'), img = ctx.createImageData(N, N), d = img.data;
-        for (var j = 0; j < N; j++) {
-          for (var i = 0; i < N; i++) {
-            var x = (i + 0.5) / N - 0.5, y = (j + 0.5) / N - 0.5;
-            var w = Math.min(1, 2 * (x * x + y * y)), k = 4 * (j * N + i);
-            d[k] = Math.round(255 * (0.5 + w * x));
-            d[k + 1] = Math.round(255 * (0.5 + w * y));
-            d[k + 3] = 255;
+        // An instant jump, whatever .tube's scroll-behavior says: a restore or
+        // a kept place should never animate.
+        function jump(y) {
+          var s = tube.style.scrollBehavior;
+          tube.style.scrollBehavior = 'auto';
+          tube.scrollTop = y;
+          tube.style.scrollBehavior = s;
+        }
+
+        // 1-2. the warp
+        var src = document.getElementById('crt-warp-src'), map = document.getElementById('crt-warp-map');
+        var wide = matchMedia('(min-width: 900px)'), built = false, last;
+        function warp() {
+          if (!root.classList.contains('warp') || !wide.matches) return;
+          if (!built) {
+            built = true;
+            var N = 256, c = document.createElement('canvas');
+            c.width = c.height = N;
+            var ctx = c.getContext('2d'), img = ctx.createImageData(N, N), px = img.data;
+            for (var j = 0; j < N; j++) {
+              for (var i = 0; i < N; i++) {
+                var x = (i + 0.5) / N - 0.5, y = (j + 0.5) / N - 0.5;
+                var w = Math.min(1, 2 * (x * x + y * y)), k = 4 * (j * N + i);
+                px[k] = Math.round(255 * (0.5 + w * x));
+                px[k + 1] = Math.round(255 * (0.5 + w * y));
+                px[k + 3] = 255;
+              }
+            }
+            ctx.putImageData(img, 0, 0);
+            src.setAttribute('href', c.toDataURL());
           }
-        }
-        ctx.putImageData(img, 0, 0);
-        document.getElementById('crt-warp-src').setAttribute('href', c.toDataURL());
-
-        var map = document.getElementById('crt-warp-map'), last;
-        function fit() {
           var s = String(Math.round(24 * Math.pow(innerWidth / 900, 1.5)));
           if (s !== last) map.setAttribute('scale', last = s);
         }
-        fit();
-        addEventListener('resize', fit);
+        addEventListener('resize', warp);
 
-        function apply(on) {
-          root.classList.toggle('warp', on);
-          root.classList.toggle('flat', !on);
-          root.dataset.theme = on ? 'dark' : 'light';
-          btn.setAttribute('aria-pressed', String(on));
+        // 3. the controls
+        var controls = document.querySelectorAll('[data-pref]');
+        var motion = matchMedia('(prefers-reduced-motion: reduce)');
+        var note = document.getElementById('pref-effects-note');
+        // What "Effects" actually turns on here: the global reduced-motion
+        // rules keep the sweep and flicker off whatever is chosen, and the
+        // curve only exists on Chromium at >= 900px.
+        function describe() {
+          var parts = ['scanlines'];
+          if (!motion.matches) parts.push('a refresh sweep', 'heading flicker');
+          if (d.chromium && wide.matches) parts.push('a screen curve');
+          var list = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0];
+          return 'Turns on ' + list + '.' +
+            (motion.matches ? ' The sweep and flicker stay off while your system asks for reduced motion.' : '') +
+            ' Dark CRT only.';
         }
-        // the head script already decided this; don't re-derive it
-        apply(window.__crtBoot.on);
-        btn.addEventListener('click', function () {
-          var on = !root.classList.contains('warp');
-          apply(on);
-          try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+        function sync() {
+          for (var i = 0; i < controls.length; i++) {
+            var b = controls[i], key = b.getAttribute('data-pref'), val = b.getAttribute('data-value');
+            b.setAttribute('aria-pressed', String(val === null ? d.design === 'crt' : d[key] === val));
+            // effects only exist on the CRT; the choice is kept, not offered
+            if (key === 'effects') b.disabled = d.design !== 'crt';
+          }
+          if (note) note.textContent = describe();
+          warp();
+        }
+        listen(wide, sync);
+        function anchor() {
+          if (tube.scrollTop < 1) return null;
+          var top = tube.getBoundingClientRect().top;
+          var blocks = document.querySelectorAll('main h1, main h2, main h3, main p, main li, main figure');
+          for (var i = 0; i < blocks.length; i++) {
+            var r = blocks[i].getBoundingClientRect();
+            if (r.bottom > top) return { el: blocks[i], top: r.top };
+          }
+          return null;
+        }
+        // Change the display without moving the reader.
+        function restyle(change) {
+          var a = anchor();
+          change();
+          sync();
+          if (a) jump(tube.scrollTop + a.el.getBoundingClientRect().top - a.top);
+        }
+        function choose(key, value) {
+          restyle(function () { d.set(key, value); });
+        }
+        for (var i = 0; i < controls.length; i++) {
+          controls[i].addEventListener('click', function () {
+            var val = this.getAttribute('data-value');
+            choose(this.getAttribute('data-pref'), val === null ? (d.design === 'crt' ? 'tablet' : 'crt') : val);
+          });
+        }
+        sync();
+
+        // No stored effects choice: follow the OS setting if it changes. The
+        // description follows it either way.
+        listen(motion, function () {
+          if (!d.effectsChosen) d.effects = motion.matches ? 'off' : 'on';
+          d.apply();
+          sync();
+        });
+
+        // Back from the back/forward cache: the page is as it was left, so
+        // catch it up with any display choice made on the pages since.
+        addEventListener('pageshow', function (e) {
+          if (!e.persisted) return;
+          restyle(function () { d.load(); d.apply(); });
+        });
+
+        // The chin's power button and the phone header's swap at 721px. A
+        // keyboard user focused on the one that just went away is handed the
+        // other, without scrolling the page to reach it (the header one sits
+        // at the top of the tube). Pointer focus is not handed on: a click or
+        // tap clears the record, so a button clicked long ago can't take focus
+        // back on a later resize or rotation.
+        var lastFocus = null, pointing = false;
+        document.addEventListener('pointerdown', function () { pointing = true; lastFocus = null; }, true);
+        // A key pressed on a button that a click focused (no new focusin) makes
+        // it the keyboard's.
+        document.addEventListener('keydown', function () {
+          pointing = false;
+          var a = document.activeElement;
+          if (a && a !== document.body) lastFocus = a;
+        }, true);
+        document.addEventListener('focusin', function (e) { lastFocus = pointing ? null : e.target; });
+        listen(matchMedia('(min-width: 721px)'), function () {
+          var f = lastFocus;
+          if (!f || !f.classList || !f.classList.contains('power-btn') || f.getClientRects().length) return;
+          // still on it, or dropped to <body> because it was just hidden
+          if (document.activeElement !== f && document.activeElement !== document.body) return;
+          var all = document.querySelectorAll('.power-btn');
+          for (var i = 0; i < all.length; i++) {
+            if (all[i] !== f && all[i].getClientRects().length) { all[i].focus({ preventScroll: true }); return; }
+          }
+        });
+
+        // 4. the keyboard
+        var STEP = { ArrowDown: 40, ArrowUp: -40, PageDown: 'page', PageUp: '-page', ' ': 'page', Home: 'top', End: 'end' };
+        addEventListener('keydown', function (e) {
+          if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !(e.key in STEP)) return;
+          if (root.classList.contains('menu-open')) return;
+          var t = e.target;
+          if (t && t !== document.body && t !== root) {
+            // focus inside the page already scrolls the tube natively
+            if (tube.contains(t)) return;
+            // a focused control outside it keeps Space and arrows for itself
+            if (e.key === ' ' || e.key.indexOf('Arrow') === 0 || t.isContentEditable) return;
+          }
+          e.preventDefault();
+          var s = STEP[e.key], page = tube.clientHeight * 0.875;
+          // Shift+Space pages up, as it does on any page
+          if (e.key === ' ' && e.shiftKey) s = '-page';
+          if (s === 'top') tube.scrollTo({ top: 0 });
+          else if (s === 'end') tube.scrollTo({ top: tube.scrollHeight });
+          else if (s === 'page') tube.scrollBy({ top: page });
+          else if (s === '-page') tube.scrollBy({ top: -page });
+          else tube.scrollBy({ top: s });
+        });
+
+        // 5. scroll memory
+        var PREFIX = 'tube-y:';
+        function entryKey(create) {
+          var st = history.state;
+          if (st && typeof st === 'object' && typeof st.tubeKey === 'string') return st.tubeKey;
+          // someone else's non-object state: leave it alone
+          if (!create || (st !== null && typeof st !== 'object')) return null;
+          var k = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+          var next = {};
+          if (st) for (var p in st) next[p] = st[p];
+          next.tubeKey = k;
+          try { history.replaceState(next, ''); } catch (e) { return null; }
+          return k;
+        }
+        function read(k) {
+          var v = null;
+          if (!k) return null;
+          try { v = sessionStorage.getItem(PREFIX + k); } catch (e) {}
+          return v === null || isNaN(+v) ? null : +v;
+        }
+        function write(k, y) {
+          if (k) try { sessionStorage.setItem(PREFIX + k, String(Math.round(y))); } catch (e) {}
+        }
+
+        // The key of the entry this document is showing. Everything that
+        // writes an offset uses this, never history.state at write time:
+        // WebKit already reports the incoming entry's state to the outgoing
+        // document's pagehide on a cross-document back/forward, which wrote
+        // the page being left over the page being returned to. It only
+        // changes where the entry really changes inside this document: at
+        // boot, and on popstate/hashchange (#hash links and their history).
+
+        // Read before tagging: an entry arriving without a key is a new visit.
+        var target = read(entryKey(false));
+        var current = entryKey(true);
+        if (target !== null) {
+          jump(target);
+          // Fonts can still move the text; land again once everything has,
+          // unless the visitor has already started moving.
+          var moved = false;
+          var stop = function () { moved = true; };
+          ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function (t) {
+            addEventListener(t, stop, { once: true, passive: true });
+          });
+          addEventListener('load', function () { if (!moved) jump(target); });
+        }
+
+        // Scrolling records { key, offset } as it happens, with the key of the
+        // entry being scrolled, and writes it after a pause. The key is taken
+        // at the scroll, not at the write, so a back/forward inside the pause
+        // can't hand the offset to the entry it lands on.
+        var timer, pending = null;
+        function flush() {
+          clearTimeout(timer);
+          if (pending) write(pending.k, pending.y);
+          pending = null;
+        }
+        tube.addEventListener('scroll', function () {
+          if (!current) return;
+          pending = { k: current, y: tube.scrollTop };
+          clearTimeout(timer);
+          timer = setTimeout(flush, 150);
+        }, { passive: true });
+        // Last word for the entry being left: on a link click (it is still
+        // current then, before a #hash entry is pushed) and on pagehide.
+        document.addEventListener('click', function (e) {
+          if (e.target.closest && e.target.closest('a[href]')) { flush(); write(current, tube.scrollTop); }
+        }, true);
+        addEventListener('pagehide', function () { flush(); write(current, tube.scrollTop); });
+
+        // Same-document back/forward, and (in most engines) a #hash link. The
+        // entry just left keeps what it was scrolled to, pending write
+        // included; the entry arrived at gets its key (a fresh one if it is a
+        // new #hash entry) and its saved offset, if it has one.
+        addEventListener('popstate', function () {
+          flush();
+          current = entryKey(true);
+          var y = read(current);
+          if (y !== null) jump(y);
+        });
+        // A #hash link in an engine that fires no popstate for it. Anything
+        // recorded since the click (which already saved the old entry) is the
+        // new entry's fragment scroll under the old key, so it is dropped and
+        // the new entry is saved where it now stands.
+        addEventListener('hashchange', function () {
+          var k = entryKey(true);
+          if (k === current) return; // popstate got here first
+          clearTimeout(timer);
+          pending = null;
+          current = k;
+          write(current, tube.scrollTop);
         });
       })();
     </script>
@@ -264,7 +542,78 @@ const ogImageURL = new URL('/og-image.png', Astro.site);
   .footer-row {
     display: flex;
     align-items: center;
-    gap: var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  /* ---- display settings: two small segmented rows, dressed like the tabs ---- */
+  .display-prefs {
+    display: none;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    margin-left: auto;
+  }
+  :global(html.js) .display-prefs { display: flex; }
+
+  .pref {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .pref-label {
+    margin-right: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: var(--grid);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* 28px tall at the default size, clear of the 24px minimum target */
+  .pref-opt {
+    min-height: var(--grid);
+    padding: 0 calc(var(--grid) * 0.4);
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: 1.3;
+    letter-spacing: 0.03em;
+    color: var(--ink-2);
+    background: transparent;
+    border: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .pref-opt:hover:not(:disabled) { color: var(--amber); border-color: color-mix(in oklch, var(--amber) 50%, transparent); }
+  .pref-opt[aria-pressed='true'] {
+    color: var(--amber);
+    border-color: color-mix(in oklch, var(--amber) 50%, transparent);
+    box-shadow: inset 0 -2px 0 var(--hot);
+  }
+  .pref-opt:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* the tablet: sans capsules, the chosen one a raised pill like its tabs */
+  :global(html.flat) .pref-opt {
+    font-family: var(--font-sans);
+    letter-spacing: normal;
+    border-radius: var(--radius-pill);
+  }
+  :global(html.flat) .pref-opt[aria-pressed='true'] {
+    color: var(--ink);
+    background: var(--panel);
+    border-color: transparent;
+    box-shadow: var(--shadow-card);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .footer-line {
