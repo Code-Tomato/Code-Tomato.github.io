@@ -25,3 +25,9 @@ pnpm-debug.log*
 
 # fonts downloaded by scripts/generate-og.mjs
 scripts/.fonts/
+
+# browser test output
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
