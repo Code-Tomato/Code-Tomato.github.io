@@ -1,10 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { publication, resumeUrl } from '../data/experience';
+import { getFeaturedProjects } from '../data/projects';
+
+// the action under the evidence links the baselines; this row carries the rest
+const moreWork = getFeaturedProjects().filter((p) => p.slug !== 'serving-baselines');
 ---
 
 <BaseLayout
-  title="Home"
-  description="Nathan Lemma: systems for machine learning. ECE at UT Austin, SOSP '26 contributor, systems software at Caterpillar."
+  title="Systems for ML"
+  description="Nathan Lemma: systems for machine learning. ECE at UT Austin, third author on a SOSP '26 paper, systems software at Caterpillar."
 >
   <!-- ============ HERO — the instrument panel ============ -->
   <section class="hero">
@@ -18,12 +23,34 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="panel-copy">
           <h1 class="display hero-title">Nathan Lemma</h1>
           <p class="hero-role">
-            ECE at UT Austin. GPU inference serving in the systems-for-ML group; firmware and data
-            infrastructure at Caterpillar.
+            Systems for ML: GPU inference serving and its energy cost, as an undergraduate researcher
+            in ECE at UT Austin. Firmware and data infrastructure at Caterpillar.
           </p>
+
+          <!-- The evidence, one readout per row: the paper, then the rest of the
+               featured work. Plain anchors, so all of it works without JS. -->
+          <ul class="hero-proof">
+            <li>
+              <span class="label proof-key">{publication.venue}</span>
+              <span class="proof-val">
+                {publication.authorship}, {publication.note}:{' '}
+                <a href={publication.paper}>“{publication.title}” ↗</a>
+              </span>
+            </li>
+            <li>
+              <span class="label proof-key">Featured</span>
+              <span class="proof-val">
+                {moreWork.map((p, i) => (
+                  <>{i > 0 && ' · '}<a href={`/projects/${p.slug}`}>{p.title}</a></>
+                ))}
+              </span>
+            </li>
+          </ul>
+
           <div class="hero-actions">
             <a class="btn btn-sweep" href="/projects">Projects</a>
-            <a class="hero-alt" href="/projects/serving-baselines">Most recent project →</a>
+            <a class="hero-alt" href="/projects/serving-baselines">EnerTune: my contribution →</a>
+            <a class="hero-alt" href={resumeUrl}>Résumé (PDF)</a>
           </div>
         </div>
 
@@ -95,7 +122,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       justify-self: center;
       align-self: start;
       margin-top: calc(var(--grid) * -1.95);
-      width: min(100%, 19rem);
+      /* px, not rem: a graphic, not text. At 19rem a 150% root text size
+         grew it past its column, and rotated 35deg its box is ~1.4x wider
+         still, which pushed 17px past the tube at 1440. */
+      width: min(100%, 304px);
       height: auto;
       rotate: 35deg;
       filter: drop-shadow(0 0 16px var(--glow-hot));
@@ -126,6 +156,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     max-width: 48ch;
     margin-top: var(--space-4);
   }
+
+  /* ---- the evidence: two readout rows, key left, value right ---- */
+  .hero-proof {
+    list-style: none;
+    margin-top: var(--space-4);
+    border-top: 1px solid var(--line-2);
+    font-size: var(--text-small);
+    max-width: 60ch;
+  }
+
+  .hero-proof li {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--space-3);
+    padding-block: var(--space-1);
+    border-bottom: 1px solid var(--line-2);
+  }
+
+  .proof-key { color: var(--hot); }
+  .proof-val { color: var(--ink-2); }
 
   .hero-actions {
     display: flex;
@@ -238,6 +289,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   @media (max-width: 640px) {
     .hero { padding-block: var(--space-3) var(--space-6); }
     .hero-role { margin-top: var(--space-3); }
+    .hero-proof { margin-top: var(--space-3); }
+    .hero-proof li { grid-template-columns: 4.5rem minmax(0, 1fr); }
     .hero-actions { margin-top: var(--space-4); gap: var(--space-4); }
     .btn { width: 100%; justify-content: center; }
   }

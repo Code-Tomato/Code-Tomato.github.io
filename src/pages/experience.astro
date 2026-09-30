@@ -86,10 +86,10 @@ const roleTitle = (g: OrgGroup): string => ROLE_TITLE[g.org] ?? g.roles[0].role;
                 g.roles.length === 1 ? (
                   <li class="xp-entry prose">
                     <div class="xp-head">
-                      <p class="xp-title">
-                        <span class="xp-org">{g.org}</span>
+                      <h2 class="xp-title">
+                        <span class="xp-org">{g.org}</span>{' '}
                         <span class="xp-role">{g.roles[0].role}</span>
-                      </p>
+                      </h2>
                       <p class="label xp-period">{g.roles[0].period}</p>
                     </div>
                     <ul class="xp-bullets">
@@ -101,19 +101,19 @@ const roleTitle = (g: OrgGroup): string => ROLE_TITLE[g.org] ?? g.roles[0].role;
                 ) : (
                   <li class="xp-entry xp-group">
                     <div class="xp-head">
-                      <p class="xp-title">
-                        <span class="xp-org">{g.org}</span>
+                      <h2 class="xp-title">
+                        <span class="xp-org">{g.org}</span>{' '}
                         <span class="xp-role">{roleTitle(g)}</span>
-                      </p>
+                      </h2>
                       <p class="label xp-period">{groupPeriod(g.roles)}</p>
                     </div>
                     <ul class="xp-roles">
                       {g.roles.map((r) => (
                         <li class="xp-role-item prose">
                           <div class="xp-head">
-                            <p class="xp-title">
+                            <h3 class="xp-title">
                               <span class="xp-role-name">{r.role}</span>
-                            </p>
+                            </h3>
                             <p class="label xp-period">{r.period}</p>
                           </div>
                           <ul class="xp-bullets">
@@ -154,8 +154,15 @@ const roleTitle = (g: OrgGroup): string => ROLE_TITLE[g.org] ?? g.roles[0].role;
     gap: var(--space-1) var(--space-6);
   }
 
+  /* Real h2/h3 for the outline, set as the body-text line they always were:
+     none of the global heading type, glow or flicker. */
   .xp-title {
+    font: inherit;
     font-weight: 500;
+    letter-spacing: normal;
+    text-wrap: pretty;
+    animation: none;
+    text-shadow: none;
     max-width: none;
   }
 

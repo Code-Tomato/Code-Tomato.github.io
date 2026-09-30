@@ -6,6 +6,14 @@ Third author on EnerTune (SOSP '26).
 
 **Live:** [code-tomato.github.io](https://code-tomato.github.io)
 
+## Résumé
+
+`public/NathanLemmaPublicResume.pdf` is the public variant of the one-page
+résumé (no phone or email), built in the private résumé repo by
+`./build.sh public`. To update it, rebuild there, check the PDF (one page, no
+contact details), and copy only `NathanLemmaPublicResume.pdf` into `public/`.
+Never copy the private PDFs or any `.typ` sources here.
+
 ## Design
 
 The site is one screen in a physical set (a bezel, a chin, and a power button

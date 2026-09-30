@@ -1,6 +1,8 @@
 ---
-// Hand-drawn figures, one per featured project. Each is real data from
-// that project's results — imagery, not decoration.
+// Hand-drawn figures, one per featured project. They are schematics: the
+// numbers printed on them are the project's reported results, but no line
+// or bar is plotted from data, and each caption says so and gives the
+// conditions behind the numbers.
 // Callers guard on FIGURE_SLUGS; the frame is rendered here so spacing and
 // padding live in one place.
 export const FIGURE_SLUGS = ['serving-baselines', 'cht-radix', 'mllm-energy', 'pintos'];
@@ -10,6 +12,16 @@ export interface Props {
 }
 
 const { slug } = Astro.props;
+
+const CAPTIONS: Record<string, string> = {
+  'serving-baselines':
+    "Schematic of the workflow, not a plot. The numbers under it are the paper's team results: energy against state-of-the-art baselines, profiling time against prior systems' own profiling methods.",
+  'cht-radix':
+    'Schematic, not plotted data: the curve shapes are illustrative. Both numbers come from the synthetic shared-prefix sweep, 8 threads, 95% reads: 88.36M ops/s is the fine-grained radix trie with 10 shared prefixes; the ~13x gap is fine- versus coarse-grained locking on that trie with 100 prefixes (13.47x).',
+  'mllm-energy':
+    'Schematic, not plotted data. Bar widths follow the phase shares at batch size 1: decode 88.7%, and the hatched 11.3% is all other phases together (vision encoder, MLP connector, prefill). Of the utilization line, only decode\'s 14% mean SM throughput is measured.',
+  pintos: 'Architecture sketch of the subsystems, not measured data.',
+};
 ---
 
 <figure class="fig-frame">
@@ -20,7 +32,7 @@ const { slug } = Astro.props;
       class="fig fig-sm"
       viewBox="0 0 340 226"
       role="img"
-      aria-label="Four published GPU-sharing serving systems (GPULets, Usher, FGD and ParvaGPU) are rebuilt from their papers, ported onto a 16-A100 cluster, and profiled to validate EnerTune."
+      aria-label="Schematic: four published GPU-sharing serving systems (GPULets, Usher, FGD and ParvaGPU) are rebuilt from their papers and ported onto a 16-A100 cluster as EnerTune's baselines."
     >
       {/* the four papers */}
       <path class="s-struct" vector-effect="non-scaling-stroke" d="M12 14 h72 v26 h-72 Z" />
@@ -53,7 +65,7 @@ const { slug } = Astro.props;
 
       {/* what the cluster produced */}
       <text class="t-major" x="170" y="208" text-anchor="middle">1.4–2.3× lower energy</text>
-      <text class="t-muted" x="170" y="222" text-anchor="middle">4 baselines profiled · 7.3× less profiling time</text>
+      <text class="t-muted" x="170" y="222" text-anchor="middle">7.3× less profiling time (avg)</text>
     </svg>
   )
 }
@@ -64,7 +76,7 @@ const { slug } = Astro.props;
       class="fig"
       viewBox="0 0 480 260"
       role="img"
-      aria-label="Throughput plot: the fine-grained curve climbs to 88.36 million operations per second, 13 times above the dashed coarse-locked baseline."
+      aria-label="Schematic throughput sketch, not plotted data: a fine-grained curve rising to 88.36 million operations per second, about 13 times above a dashed coarse-locked line."
     >
       <path class="s-struct" vector-effect="non-scaling-stroke" d="M36 28 v192 h420" />
       <path class="s-pen dashed" vector-effect="non-scaling-stroke" d="M36 208 C 140 206, 240 200, 400 196" />
@@ -86,7 +98,7 @@ const { slug } = Astro.props;
       class="fig fig-sm"
       viewBox="0 0 320 200"
       role="img"
-      aria-label="Request timeline for InternVL3-8B on an NVIDIA A100: decode occupies 88.7 percent of request time while SM utilization stays near 14 percent."
+      aria-label="Schematic request timeline for InternVL3-8B on an NVIDIA A100: decode occupies 88.7 percent of phase-attributed time, all other phases 11.3 percent, and decode's SM throughput averages 14 percent."
     >
       <defs>
         <pattern id={`hatch-${slug}`} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -97,7 +109,7 @@ const { slug } = Astro.props;
       <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 40 h272 v20 h-272 Z" />
       <path class="s-struct" vector-effect="non-scaling-stroke" d="M55 40 v20" />
       <path class="s-muted" vector-effect="non-scaling-stroke" d="M40 40 v-12" />
-      <text x="24" y="24">prefill</text>
+      <text x="24" y="24">non-decode</text>
       <text x="120" y="24">decode: 88.7% of time</text>
       <path class="s-struct" vector-effect="non-scaling-stroke" d="M24 96 v76 h272" />
       <path class="s-muted dashed" vector-effect="non-scaling-stroke" d="M24 100 h272" />
@@ -105,7 +117,9 @@ const { slug } = Astro.props;
       <path class="s-hot" vector-effect="non-scaling-stroke" d="M24 106 h24 v56 h248" />
       <rect class="nd-hot" x="46" y="160" width="4" height="4" />
       <path class="s-muted" vector-effect="non-scaling-stroke" d="M180 162 v-14" />
-      <text x="150" y="142">14% sm util</text>
+      {/* centred on its tick; 17 mono glyphs span ~122 units at the 12px
+          phone size, so 119-241, clear of the 100% label and the axis end */}
+      <text x="180" y="142" text-anchor="middle">14% SM throughput</text>
     </svg>
   )
 }
@@ -116,7 +130,7 @@ const { slug } = Astro.props;
       class="fig fig-sm"
       viewBox="0 0 320 184"
       role="img"
-      aria-label="Pintos kernel layer stack: user processes above the user/kernel boundary, then system calls, virtual memory, and file system below it."
+      aria-label="Architecture sketch of the Pintos kernel: user processes above the user/kernel boundary, then system calls, virtual memory, and file system below it."
     >
       <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 24 h160 v30 h-160 Z" />
       <path class="s-struct" vector-effect="non-scaling-stroke" d="M32 62 h160 v30 h-160 Z" />
@@ -134,6 +148,7 @@ const { slug } = Astro.props;
   )
 }
 
+<figcaption class="fig-cap">{CAPTIONS[slug]}</figcaption>
 </figure>
 
 <style>
@@ -145,6 +160,14 @@ const { slug } = Astro.props;
     display: block;
     width: 100%;
     height: auto;
+  }
+
+  /* HTML, not SVG text, so it reflows and scales with the reader's text size */
+  .fig-cap {
+    margin-top: var(--space-2);
+    font-size: var(--text-label);
+    line-height: 1.5;
+    color: var(--ink-3);
   }
 
   .fig text {
