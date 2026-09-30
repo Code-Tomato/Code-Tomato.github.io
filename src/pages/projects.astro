@@ -50,6 +50,7 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
         <em class="pub-title">“{publication.title}”</em>, {publication.authorship}.{' '}
         {publication.line}
         <span class="pub-links">
+          <a class="link-dir" href={publication.paper}>Read paper (ACM) ↗</a>
           <a class="link-dir" href={publication.repo}>EnerTune repo ↗</a>
           <a class="link-dir" href="/projects/serving-baselines">The baselines I built →</a>
         </span>
@@ -124,12 +125,14 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
 
   /* The two links are their own row under the citation. They used to be bare
      inline-blocks in the paragraph, which let them trail off the last line of
-     prose with no gap whenever the text happened to wrap short. */
+     prose with no gap whenever the text happened to wrap short. Flex so a
+     narrow screen breaks between links, never inside one. */
   .pub-links {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
     margin-top: var(--space-3);
   }
-  .pub-line .link-dir { margin-right: var(--space-3); }
 
   /* ---- 01 / featured: one card per project ---- */
   .card-grid {

@@ -1,4 +1,6 @@
 // Generated from the July 2026 content model (tiered project data, verified links only).
+import { publication } from './experience';
+
 export type Tier = 'featured' | 'current' | 'archived';
 
 export interface ProjectLinks {
@@ -39,7 +41,8 @@ export const projects: Project[] = [
     ],
     category: ['Research/Academic', 'Machine Learning Systems'],
     links: {
-      github: 'https://github.com/Code-Tomato/sus-gpus-baselines'
+      github: 'https://github.com/Code-Tomato/sus-gpus-baselines',
+      paper: publication.paper
     },
     description:
       "<strong>Third author on EnerTune (SOSP '26)</strong>, as an undergraduate research assistant in UT Austin's ECE systems-for-ML group. I rebuilt <strong>four GPU-sharing serving systems</strong> (GPULets, Usher, FGD, ParvaGPU) from their papers and ported each onto our <strong>16-A100 cluster</strong>, which is what made a fair comparison possible and enabled EnerTune's <strong>1.4-2.3x lower energy</strong> result. Profiling all four then showed its model cuts profiling time <strong>7.3x on average</strong>.",
