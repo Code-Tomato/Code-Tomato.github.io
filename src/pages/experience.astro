@@ -170,9 +170,12 @@ const roleTitle = (g: OrgGroup): string => ROLE_TITLE[g.org] ?? g.roles[0].role;
     color: var(--ink-2);
   }
 
+  /* No nowrap: .xp-head wraps the period onto its own line whole when it
+     doesn't fit beside the title, so it only breaks mid-phrase when a line
+     of its own is too narrow ("Summer 2025, part-time through 2025-26" at
+     390px), where nowrap pushed it off-screen. */
   .xp-period {
     color: var(--ink-3);
-    white-space: nowrap;
   }
 
   .xp-bullets {

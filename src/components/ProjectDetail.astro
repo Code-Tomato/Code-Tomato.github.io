@@ -81,9 +81,11 @@ const meta = [...(project.teamProject ? ['Team project'] : []), project.category
 </section>
 
 <style>
+  /* No nowrap: .title-row moves the date to its own line whole whenever it
+     doesn't fit beside the title, so it only ever breaks when even a line
+     of its own is too narrow (320px with enlarged text), not off-screen. */
   .detail-date {
     color: var(--ink-3);
-    white-space: nowrap;
   }
 
   /* sits in the aside slot, so .sec-head's margin-left:auto still right-aligns it */
