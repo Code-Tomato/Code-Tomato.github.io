@@ -136,6 +136,13 @@ const meta = [...(project.teamProject ? ['Team project'] : []), project.category
     gap: var(--space-2) var(--space-6);
   }
 
+  /* A one-word title wider than the screen ("Keyboard2x2", "Eigensolver" in
+     the mono h1 at 320px with 150% text) may break inside the word; it only
+     does when the word can't fit a line of its own. "anywhere", not
+     "break-word", because only it lowers the min-content width this flex item
+     is sized from, so the h1 can shrink to the row instead of pushing past it. */
+  .title-row h1 { overflow-wrap: anywhere; }
+
   .detail-meta {
     margin-top: var(--space-2);
     color: var(--ink-3);
