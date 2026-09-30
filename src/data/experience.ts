@@ -6,6 +6,7 @@ export interface Publication {
   note: string;
   title: string;
   authorship: string;
+  doi: string;
   paper: string;
   repo: string;
   line: string;
@@ -24,14 +25,24 @@ export interface SkillGroup {
   items: string[];
 }
 
+// The public one-page résumé (no phone or email). Copied into public/ from the
+// résumé repo's generated output; see README.
+export const resumeUrl = '/NathanLemmaPublicResume.pdf';
+
+export const orcidUrl = 'https://orcid.org/0009-0006-5232-8595';
+
+const doi = '10.1145/3830418.3843913';
+
+// The paper's result is the team's; `line` says which part of it was mine.
 export const publication: Publication = {
   venue: "SOSP '26",
   note: 'published',
   title: 'Beyond Utilization: Energy-Conscious GPU Sharing for Inference Serving',
   authorship: '3rd author',
-  paper: 'https://dl.acm.org/doi/10.1145/3830418.3843913',
+  doi,
+  paper: `https://dl.acm.org/doi/${doi}`,
   repo: 'https://github.com/UT-SysML/EnerTune',
-  line: "EnerTune, from UT Austin's systems-for-ML group. I rebuilt the four GPU-sharing serving systems it is measured against, ported them to our 16-A100 cluster, and did the evaluation behind its 1.4-2.3x lower energy and 7.3x average profiling-time reduction."
+  line: "EnerTune, from UT Austin's systems-for-ML group. I rebuilt the four GPU-sharing serving systems it is measured against and ported them to our 16-A100 cluster, enabling its 1.4-2.3x lower-energy result, and contributed baseline profiling to its 7.3x average profiling-time reduction."
 };
 
 export const experience: ExperienceEntry[] = [
@@ -52,7 +63,7 @@ export const experience: ExperienceEntry[] = [
     bullets: [
       'Rebuilt 4 state-of-the-art GPU-sharing inference serving systems (GPULets, Usher, FGD, ParvaGPU) to benchmark EnerTune.',
       "Debugged and ported each baseline's research prototype onto our 16-A100 cluster, enabling the 1.4-2.3x lower energy result.",
-      "Profiled all 4 baselines to show EnerTune's analytical model cuts profiling time 7.3x on average, up to 17.3x, over brute force."
+      "Profiled the baselines to show EnerTune's analytical model cuts profiling time 7.3x on average, up to 17.3x, versus prior systems' profiling."
     ]
   },
   {

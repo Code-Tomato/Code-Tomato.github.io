@@ -1,5 +1,5 @@
 ---
-import { publication } from '../data/experience';
+import { publication, orcidUrl } from '../data/experience';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { projects, getFeaturedProjects } from '../data/projects';
 
@@ -42,17 +42,21 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
     <div class="container">
       <div class="sec-head">
         <span class="sec-index">00</span>
-        <span class="sec-label" id="pub-heading">Publication</span>
-        <span class="sec-aside">{publication.venue} · {publication.note}</span>
+        <h2 class="sec-label" id="pub-heading">Publication</h2>
+        <span class="sec-aside">DOI {publication.doi}</span>
       </div>
 
+      <!-- Venue and status live in the citation, not the aside: phones hide
+           every .sec-aside, and a citation without its venue is half of one. -->
       <p class="pub-line">
-        <em class="pub-title">“{publication.title}”</em>, {publication.authorship}.{' '}
+        <em class="pub-title">“{publication.title}”</em>, {publication.authorship},{' '}
+        <span class="pub-venue">{publication.venue} ({publication.note})</span>.{' '}
         {publication.line}
         <span class="pub-links">
           <a class="link-dir" href={publication.paper}>Read paper (ACM) ↗</a>
           <a class="link-dir" href={publication.repo}>EnerTune repo ↗</a>
           <a class="link-dir" href="/projects/serving-baselines">The baselines I built →</a>
+          <a class="link-dir" href={orcidUrl}>ORCID ↗</a>
         </span>
       </p>
     </div>
@@ -62,7 +66,7 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
     <div class="container">
       <div class="sec-head">
         <span class="sec-index">01</span>
-        <span class="sec-label" id="featured-heading">Featured</span>
+        <h2 class="sec-label" id="featured-heading">Featured</h2>
         <span class="sec-aside">current research &amp; systems</span>
       </div>
 
@@ -72,7 +76,7 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
             <li>
               <a class="card" href={`/projects/${p.slug}`}>
                 <span class="label card-no">{nn(p)}</span>
-                <h2 class="card-title">{p.title}</h2>
+                <h3 class="card-title">{p.title}</h3>
                 <p class="card-desc">{p.summary}</p>
                 <span class="label card-year"><time datetime={p.date}>{p.dateDisplay}</time></span>
               </a>
@@ -88,7 +92,7 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
     <div class="container">
       <div class="sec-head">
         <span class="sec-index">02</span>
-        <span class="sec-label" id="rest-heading">Everything else</span>
+        <h2 class="sec-label" id="rest-heading">Everything else</h2>
         <span class="sec-aside">{restSpan}</span>
       </div>
 
@@ -122,6 +126,14 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
   }
 
   .pub-title { color: var(--ink); font-style: italic; }
+
+  /* the venue reads as a readout, like the dates and indices */
+  .pub-venue {
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    color: var(--ink);
+    white-space: nowrap;
+  }
 
   /* The two links are their own row under the citation. They used to be bare
      inline-blocks in the paragraph, which let them trail off the last line of
@@ -163,10 +175,12 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
 
   .card-no { color: var(--hot); }
 
+  /* an h3 under the section's h2, still set at the h2 size it always had */
   .card-title {
     font-size: var(--text-h2);
     line-height: 1.2;
     letter-spacing: -0.01em;
+    text-wrap: balance;
   }
 
   .card:hover .card-title { color: var(--hot); }

@@ -2,7 +2,7 @@
 /**
  * Project detail, built from the same parts as every other page: a page-head
  * with its eyebrow, then numbered .section-tight blocks. Content comes
- * verbatim from projects.ts.
+ * verbatim from projects.ts; the case study only where a project has one.
  */
 import ProjectFigure, { FIGURE_SLUGS } from './ProjectFigure.astro';
 import { type Project } from '../data/projects';
@@ -24,6 +24,17 @@ const hasLinks = Boolean(project.links.github) || textLinks.length > 0;
 
 // the date sits beside the title now, so this is what is left
 const meta = [...(project.teamProject ? ['Team project'] : []), project.category[0]].filter(Boolean);
+
+const cs = project.caseStudy;
+const caseRows = cs
+  ? [
+      { label: 'Problem', html: cs.problem },
+      { label: 'My part', html: cs.role },
+      { label: 'Approach', html: cs.approach },
+      { label: 'Evidence', html: cs.evidence },
+      { label: 'Limits', html: cs.limitations },
+    ].filter((row): row is { label: string; html: string } => Boolean(row.html))
+  : [];
 
 ---
 
@@ -69,9 +80,27 @@ const meta = [...(project.teamProject ? ['Team project'] : []), project.category
       {hasFigure && <ProjectFigure slug={project.slug} />}
     </div>
 
+    {
+      caseRows.length > 0 && (
+        <section class="case-block" aria-labelledby="sec-case">
+          <div class="sec-head">
+            <h2 class="sec-label" id="sec-case">Case study</h2>
+          </div>
+          <div class="case-list">
+            {caseRows.map((row) => (
+              <div class="case-row">
+                <h3>{row.label}</h3>
+                <p set:html={row.html} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
     <div class="tag-block">
       <div class="sec-head">
-        <span class="sec-label" id="sec-skills">Skills</span>
+        <h2 class="sec-label" id="sec-skills">Skills</h2>
       </div>
       <ul class="tag-row" aria-labelledby="sec-skills">
         {project.tags.map((tag) => <li class="label tag">{tag}</li>)}
@@ -161,7 +190,32 @@ const meta = [...(project.teamProject ? ['Team project'] : []), project.category
 
   /* its own full-width band under the partition; the sec-head rule does the
      separating, so it needs far less air above it than a bare row did */
+  .case-block,
   .tag-block { margin-top: var(--space-6); }
+
+  /* About's fact rows: label left, prose right, hairline between. The h3 keeps
+     the design's h3 voice; only the row does the layout. */
+  .case-list {
+    display: grid;
+    border-bottom: 1px solid var(--line-2);
+  }
+
+  .case-row {
+    display: grid;
+    gap: var(--space-1) var(--space-8);
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--line-2);
+  }
+
+  .case-list .case-row:first-child { border-top: none; padding-top: 0; }
+
+  @media (min-width: 768px) {
+    .case-row { grid-template-columns: 10rem minmax(0, 1fr); }
+  }
+
+  /* anywhere, not break-word: the artifact file names are single long tokens,
+     and only anywhere lowers the min-content width the grid track sizes to */
+  .case-row p { color: var(--ink-2); overflow-wrap: anywhere; }
 
   .tag-row {
     list-style: none;

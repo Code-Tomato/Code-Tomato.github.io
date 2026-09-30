@@ -17,3 +17,11 @@ glow). Behind both is a field of hand-drawn doodles tiled from a single SVG.
 Type is IBM Plex Mono and Reddit Sans, self-hosted; nothing loads at runtime.
 
 Built with Astro. `npm run dev` to work on it, `npm run build` to ship.
+
+## Résumé
+
+`public/NathanLemmaPublicResume.pdf` is the public variant of the one-page
+résumé (no phone or email), built in the private résumé repo by
+`./build.sh public`. To update it, rebuild there, check the PDF (one page, no
+contact details), and copy only `NathanLemmaPublicResume.pdf` into `public/`.
+Never copy the private PDFs or any `.typ` sources here.
