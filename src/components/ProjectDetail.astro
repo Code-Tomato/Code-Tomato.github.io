@@ -95,6 +95,19 @@ const meta = [...(project.teamProject ? ['Team project'] : []), project.category
 
   .link-set-label { color: var(--ink-3); }
 
+  /* global.css hides every .sec-aside on phones; this one is the project's
+     links, so it stays and drops to its own row under the back link. */
+  @media (max-width: 640px) {
+    .sec-head { flex-wrap: wrap; }
+    .sec-head .sec-aside.link-set {
+      display: flex;
+      flex-wrap: wrap;
+      flex-basis: 100%;
+      margin-left: 0;
+      row-gap: var(--space-1);
+    }
+  }
+
   .gh-link {
     display: inline-flex;
     color: var(--ink-3);

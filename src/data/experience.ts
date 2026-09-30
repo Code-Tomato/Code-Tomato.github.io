@@ -6,6 +6,7 @@ export interface Publication {
   note: string;
   title: string;
   authorship: string;
+  paper: string;
   repo: string;
   line: string;
 }
@@ -25,9 +26,10 @@ export interface SkillGroup {
 
 export const publication: Publication = {
   venue: "SOSP '26",
-  note: 'accepted',
+  note: 'published',
   title: 'Beyond Utilization: Energy-Conscious GPU Sharing for Inference Serving',
   authorship: '3rd author',
+  paper: 'https://dl.acm.org/doi/10.1145/3830418.3843913',
   repo: 'https://github.com/UT-SysML/EnerTune',
   line: "EnerTune, from UT Austin's systems-for-ML group. I rebuilt the four GPU-sharing serving systems it is measured against, ported them to our 16-A100 cluster, and did the evaluation behind its 1.4-2.3x lower energy and 7.3x average profiling-time reduction."
 };
