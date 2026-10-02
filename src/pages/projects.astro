@@ -43,7 +43,7 @@ const restSpan = `${Math.min(...restYears)}–${Math.max(...restYears)}`;
       <div class="sec-head">
         <span class="sec-index">00</span>
         <h2 class="sec-label" id="pub-heading">Publication</h2>
-        <span class="sec-aside">DOI {publication.doi}</span>
+        <a class="sec-aside" href={publication.paper}>doi:{publication.doi}</a>
       </div>
 
       <!-- Venue and status live in the citation, not the aside: phones hide

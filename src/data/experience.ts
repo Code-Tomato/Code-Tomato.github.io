@@ -40,7 +40,7 @@ export const publication: Publication = {
   title: 'Beyond Utilization: Energy-Conscious GPU Sharing for Inference Serving',
   authorship: '3rd author',
   doi,
-  paper: `https://dl.acm.org/doi/${doi}`,
+  paper: `https://doi.org/${doi}`,
   repo: 'https://github.com/UT-SysML/EnerTune',
   line: "EnerTune, from UT Austin's systems-for-ML group. I rebuilt the four GPU-sharing serving systems it is measured against and ported them to our 16-A100 cluster, enabling its 1.4-2.3x lower-energy result, and contributed baseline profiling to its 7.3x average profiling-time reduction."
 };
