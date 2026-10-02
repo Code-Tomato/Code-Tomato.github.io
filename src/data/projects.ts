@@ -60,7 +60,7 @@ export const projects: Project[] = [
       paper: publication.paper
     },
     description:
-      "<strong>Third author on EnerTune (SOSP '26)</strong>, as an undergraduate research assistant in UT Austin's ECE systems-for-ML group. I rebuilt <strong>four GPU-sharing serving systems</strong> (GPULets, Usher, FGD, ParvaGPU) from their papers and ported each onto our <strong>16-A100 cluster</strong>, which is what made a fair comparison possible and enabled EnerTune's <strong>1.4-2.3x lower energy</strong> result. My baseline profiling also fed its <strong>7.3x average</strong> cut in profiling time.",
+      "<strong>Third author on EnerTune (SOSP '26)</strong>, as an undergraduate research assistant in Yadwadkar's SysML Lab at UT Austin. I rebuilt <strong>four GPU-sharing serving systems</strong> (GPULets, Usher, FGD, ParvaGPU) from their papers and ported each onto our <strong>16-A100 cluster</strong>, which is what made a fair comparison possible and enabled EnerTune's <strong>1.4-2.3x lower energy</strong> result. My baseline profiling also fed its <strong>7.3x average</strong> cut in profiling time.",
     teamProject: true,
     caseStudy: {
       problem:
@@ -233,7 +233,7 @@ export const projects: Project[] = [
     tier: 'archived',
     title: 'Primate-Sim',
     summary:
-      "An instruction-accurate RISC-V simulator built in UT's FAST group to validate the Primate compiler.",
+      "An instruction-accurate RISC-V simulator built in Chiou's FAST Lab at UT Austin to validate the Primate compiler.",
     date: '2025-01',
     dateDisplay: 'January 2025',
     tags: ['Python', 'RISC-V', 'Simulation', 'FPGA', 'Compilers', 'Research'],
@@ -242,7 +242,7 @@ export const projects: Project[] = [
       github: 'https://github.com/FAST-Research-Group/primate-sim'
     },
     description:
-      "Contributed to the <strong>FAST Research Group's Primate compiler</strong> work before the group concluded. As a research assistant I worked on an <strong>instruction-accurate RISC-V simulator</strong> the team used to validate the compiler: handling <strong>I/O instructions</strong>, building the tools that checked compiler output against the simulator, and writing a testing app that <strong>removed redundant FPGA synthesis runs</strong> so the hardware and software sides could be developed side by side instead of waiting on each other.",
+      "Contributed to <strong>Primate compiler</strong> work in <strong>Chiou's FAST Lab at UT Austin</strong> before the group concluded. As a research assistant I worked on an <strong>instruction-accurate RISC-V simulator</strong> the team used to validate the compiler: handling <strong>I/O instructions</strong>, building the tools that checked compiler output against the simulator, and writing a testing app that <strong>removed redundant FPGA synthesis runs</strong> so the hardware and software sides could be developed side by side instead of waiting on each other.",
     teamProject: true
   },
   {

@@ -42,13 +42,13 @@ export const publication: Publication = {
   doi,
   paper: `https://doi.org/${doi}`,
   repo: 'https://github.com/UT-SysML/EnerTune',
-  line: "EnerTune, from UT Austin's systems-for-ML group. I rebuilt the four GPU-sharing serving systems it is measured against and ported them to our 16-A100 cluster, enabling its 1.4-2.3x lower-energy result, and contributed baseline profiling to its 7.3x average profiling-time reduction."
+  line: "EnerTune, from Yadwadkar's SysML Lab at UT Austin. I rebuilt the four GPU-sharing serving systems it is measured against and ported them to our 16-A100 cluster, enabling its 1.4-2.3x lower-energy result, and contributed baseline profiling to its 7.3x average profiling-time reduction."
 };
 
 export const experience: ExperienceEntry[] = [
   {
     org: 'UT Austin Research',
-    role: 'Machine Learning for Systems',
+    role: 'Machine Learning for Systems · LDOS Lab · Akella',
     period: 'Aug 2026 - Ongoing',
     track: 'research',
     bullets: [
@@ -57,7 +57,7 @@ export const experience: ExperienceEntry[] = [
   },
   {
     org: 'UT Austin Research',
-    role: 'Systems for Machine Learning',
+    role: 'Systems for Machine Learning · SysML Lab · Yadwadkar',
     period: 'Aug 2025 - May 2026',
     track: 'research',
     bullets: [
@@ -68,7 +68,7 @@ export const experience: ExperienceEntry[] = [
   },
   {
     org: 'UT Austin Research',
-    role: 'Computer Architecture & FPGAs',
+    role: 'Computer Architecture & FPGAs · FAST Lab · Chiou',
     period: 'Mar 2024 - Dec 2024',
     track: 'research',
     bullets: [
