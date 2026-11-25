@@ -5,7 +5,13 @@
 // conditions behind the numbers.
 // Callers guard on FIGURE_SLUGS; the frame is rendered here so spacing and
 // padding live in one place.
-export const FIGURE_SLUGS = ['serving-baselines', 'cht-radix', 'mllm-energy', 'pintos'];
+export const FIGURE_SLUGS = [
+  'serving-baselines',
+  'cht-radix',
+  'mllm-energy',
+  'weighted-byzantine-agreement',
+  'pintos',
+];
 
 export interface Props {
   slug: string;
@@ -20,6 +26,8 @@ const CAPTIONS: Record<string, string> = {
     'Schematic, not plotted data: the curve shapes are illustrative. Both numbers come from the synthetic shared-prefix sweep, 8 threads, 95% reads: 88.36M ops/s is the fine-grained radix trie with 10 shared prefixes; the ~13x gap is fine- versus coarse-grained locking on that trie with 100 prefixes (13.47x).',
   'mllm-energy':
     'Schematic, not plotted data. Bar widths follow the phase shares at batch size 1: decode 88.7%, and the hatched 11.3% is all other phases together (vision encoder, MLP connector, prefill). Of the utilization line, only decode\'s 14% mean SM throughput is measured.',
+  'weighted-byzantine-agreement':
+    "Drawn, not plotted, but bar lengths are to scale with the paper's expected round counts. Top pair: uniform weights, 405 processes, where early stopping saves about 10%. Bottom pair: the expected bound when faults are rare.",
   pintos: 'Architecture sketch of the subsystems, not measured data.',
 };
 ---
@@ -120,6 +128,34 @@ const CAPTIONS: Record<string, string> = {
       {/* centred on its tick; 17 mono glyphs span ~122 units at the 12px
           phone size, so 119-241, clear of the 100% label and the axis end */}
       <text x="180" y="142" text-anchor="middle">14% SM throughput</text>
+    </svg>
+  )
+}
+
+{
+  slug === 'weighted-byzantine-agreement' && (
+    <svg
+      class="fig fig-sm"
+      viewBox="0 0 320 172"
+      role="img"
+      aria-label="Expected rounds, weighted King against weighted Gradecast consensus (WGC). Uniform weights with 405 processes: King 135, WGC 122. When faults are rare: King 127, WGC about 9."
+    >
+      {/* bar length = rounds × 230/135, from x = 56 */}
+      <text x="12" y="18" class="t-muted">uniform weights, n = 405</text>
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M56 28 h230 v14 h-230 Z" />
+      <path class="s-hot" vector-effect="non-scaling-stroke" d="M56 50 h208 v14 h-208 Z" />
+      <text x="12" y="39">king</text>
+      <text x="12" y="61">wgc</text>
+      <text x="292" y="39">135</text>
+      <text x="270" y="61">122</text>
+
+      <text x="12" y="104" class="t-muted">rare faults, expected bound</text>
+      <path class="s-struct" vector-effect="non-scaling-stroke" d="M56 114 h216 v14 h-216 Z" />
+      <path class="s-hot" vector-effect="non-scaling-stroke" d="M56 136 h15 v14 h-15 Z" />
+      <text x="12" y="125">king</text>
+      <text x="12" y="147">wgc</text>
+      <text x="278" y="125">127</text>
+      <text x="78" y="147" class="t-major">~9</text>
     </svg>
   )
 }

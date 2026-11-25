@@ -134,6 +134,35 @@ export const projects: Project[] = [
     }
   },
   {
+    slug: 'weighted-byzantine-agreement',
+    tier: 'featured',
+    title: 'Weighted Byzantine Agreement',
+    summary:
+      'A weighted, early-stopping version of Gradecast-based Byzantine consensus, tested against weighted King in a simulator with seven adversaries.',
+    date: '2026-11',
+    dateDisplay: 'Fall 2026',
+    tags: ['Distributed Systems', 'Byzantine Fault Tolerance', 'Consensus', 'Python', 'Simulation', 'LaTeX'],
+    category: ['Research/Academic', 'Distributed Systems'],
+    links: {
+      github: 'https://github.com/AmauryJayr/WBA',
+      documentation: 'https://amauryjayr.github.io/WBA/',
+      paper: 'https://amauryjayr.github.io/WBA/paper.pdf'
+    },
+    description:
+      "<strong>EE 382N (Distributed Systems) term paper</strong>, written with Amaury Jayr, with a public paper and project page. In weighted Byzantine agreement every process carries a weight, and agreement only needs the faulty processes to hold less than a fraction ρ of the total. We built a <strong>weighted Gradecast consensus (WGC)</strong> that is correct for <strong>ρ &lt; 1/3</strong> and <strong>stops early</strong>. With uniform weights and 405 processes it cuts expected rounds by <strong>about 10%</strong> against weighted King (122 vs 135), and when faults are rare its expected bound is <strong>about 9 rounds against King's 127</strong>.",
+    teamProject: true,
+    caseStudy: {
+      problem:
+        "In Garg and Bridgman's weighted Byzantine agreement, each process has a weight, and agreement only needs the faulty processes to hold less than a fraction ρ of the total weight. We asked whether a weighted version of Ben-Or, Dolev and Hoch's Gradecast-based consensus could stop early, how it compares with Garg and Bridgman's weighted King, and how the weights themselves should be chosen and updated.",
+      approach:
+        'A two-person course team, with Amaury Jayr. WGC comes with a proof sketch that it works for ρ &lt; 1/3 and stops within min(F+3, cap<sub>ρ</sub>) iterations. We compared it with weighted King on Garg and Bridgman\'s setup using a Python simulator of about 2,400 lines, with exact fraction arithmetic and seven adversaries, including attacks built to force the worst case.',
+      evidence:
+        'From the <a href="https://amauryjayr.github.io/WBA/paper.pdf">paper</a>: with uniform weights and 405 processes, early stopping cuts expected rounds by about 10% (122 vs King\'s 135), and when faults are rare WGC\'s expected bound is about 9 rounds against King\'s 127. A simple weight formula, w<sub>i</sub> ∝ max(0, (τ − p<sub>i</sub>) / (p<sub>i</sub>(1 − p<sub>i</sub>))), roughly halves the chance of losing the guarantee compared with inverse-failure weights (0.019 vs 0.037). WGC\'s blacklists make a much better rule for updating weights over time than Garg and Bridgman\'s: against split-vote attackers, the guarantee held for all 100 agreement instances in every run. A correctness sweep of 26,208 runs found no violations. Figures are on the <a href="https://amauryjayr.github.io/WBA/">project page</a>.',
+      limitations:
+        'WGC costs 9-45x more bits than King: early stopping saves time, not bandwidth. Correctness rests on a proof sketch and simulation, not a full proof or a deployed system.'
+    }
+  },
+  {
     slug: 'pintos',
     tier: 'featured',
     title: 'Pintos',
